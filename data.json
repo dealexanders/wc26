@@ -1,0 +1,1725 @@
+{
+  "site": {
+    "title": "Mundial 2026",
+    "language": "en",
+    "brandIcon": "🏆",
+    "footer": "Unofficial fan-made dashboard. Flags are loaded from Flag Icons CDN; trophy is a CSS/emoji placeholder.",
+    "navigationLabel": "Primary navigation"
+  },
+  "navigation": [
+    {
+      "id": "home",
+      "label": "Home"
+    },
+    {
+      "id": "groups",
+      "label": "Groups"
+    },
+    {
+      "id": "games",
+      "label": "Games"
+    },
+    {
+      "id": "table",
+      "label": "Table"
+    }
+  ],
+  "content": {
+    "home": {
+      "eyebrow": "FIFA World Cup 2026 inspired dashboard",
+      "heading": "Mundial 2026",
+      "trophyLabel": "trophy",
+      "trophyIcon": "🏆",
+      "trophyBase": "26",
+      "stats": [
+        "12 groups",
+        "48 teams",
+        "104 matches",
+        "16 host cities"
+      ]
+    },
+    "groups": {
+      "heading": "Groups",
+      "description": "Same group breakdown as in the photos.",
+      "groupLabel": "Group"
+    },
+    "games": {
+      "heading": "Games",
+      "description": "Compact game grid based on the 104-match screenshot. Use filters to narrow it down.",
+      "searchPlaceholder": "Search team, city, date...",
+      "allFilterLabel": "All groups/stages",
+      "knockoutFilterLabel": "Knockout",
+      "versusLabel": "v",
+      "unknownMatchNumber": "—",
+      "venueTbc": "TBC"
+    },
+    "table": {
+      "heading": "Schedule table",
+      "description": "Times are Eastern Time.",
+      "columns": [
+        "#",
+        "Date",
+        "Time",
+        "Location",
+        "Stage",
+        "Group",
+        "Game"
+      ],
+      "versusLabel": "v"
+    },
+    "timeZoneLabel": "ET",
+    "loading": "Loading tournament data…",
+    "loadError": "Tournament data could not be loaded. Serve the project with a local web server and check data.json."
+  },
+  "theme": {
+    "bg": "#050508",
+    "panel": "#11131a",
+    "line": "#272b38",
+    "text": "#f7f7fb",
+    "muted": "#a8adbd",
+    "lime": "#c6ff00",
+    "pink": "#ff3d7f",
+    "blue": "#3f63ff",
+    "cyan": "#50ead6",
+    "orange": "#ff7a1a",
+    "purple": "#9d27ff",
+    "gold": "#f8c04e",
+    "radius": "22px",
+    "groupColors": {
+      "A": "#baff00",
+      "F": "#baff00",
+      "B": "#ff4d86",
+      "G": "#ff4d86",
+      "C": "#ff7a1a",
+      "K": "#ff7a1a",
+      "D": "#4b70ff",
+      "L": "#4b70ff",
+      "E": "#983cff",
+      "I": "#983cff",
+      "H": "#55ead8",
+      "J": "#55ead8"
+    }
+  },
+  "teams": {
+    "MEX": {
+      "name": "Mexico",
+      "flag": "mx"
+    },
+    "RSA": {
+      "name": "South Africa",
+      "flag": "za"
+    },
+    "KOR": {
+      "name": "Korea Republic",
+      "flag": "kr"
+    },
+    "CZE": {
+      "name": "Czechia",
+      "flag": "cz"
+    },
+    "CAN": {
+      "name": "Canada",
+      "flag": "ca"
+    },
+    "BIH": {
+      "name": "Bosnia and Herzegovina",
+      "flag": "ba"
+    },
+    "QAT": {
+      "name": "Qatar",
+      "flag": "qa"
+    },
+    "SUI": {
+      "name": "Switzerland",
+      "flag": "ch"
+    },
+    "BRA": {
+      "name": "Brazil",
+      "flag": "br"
+    },
+    "MAR": {
+      "name": "Morocco",
+      "flag": "ma"
+    },
+    "HAI": {
+      "name": "Haiti",
+      "flag": "ht"
+    },
+    "SCO": {
+      "name": "Scotland",
+      "flag": "gb-sct"
+    },
+    "USA": {
+      "name": "USA",
+      "flag": "us"
+    },
+    "PAR": {
+      "name": "Paraguay",
+      "flag": "py"
+    },
+    "AUS": {
+      "name": "Australia",
+      "flag": "au"
+    },
+    "TUR": {
+      "name": "Türkiye",
+      "flag": "tr"
+    },
+    "GER": {
+      "name": "Germany",
+      "flag": "de"
+    },
+    "CUW": {
+      "name": "Curaçao",
+      "flag": "cw"
+    },
+    "CIV": {
+      "name": "Côte d’Ivoire",
+      "flag": "ci"
+    },
+    "ECU": {
+      "name": "Ecuador",
+      "flag": "ec"
+    },
+    "NED": {
+      "name": "Netherlands",
+      "flag": "nl"
+    },
+    "JPN": {
+      "name": "Japan",
+      "flag": "jp"
+    },
+    "SWE": {
+      "name": "Sweden",
+      "flag": "se"
+    },
+    "TUN": {
+      "name": "Tunisia",
+      "flag": "tn"
+    },
+    "BEL": {
+      "name": "Belgium",
+      "flag": "be"
+    },
+    "EGY": {
+      "name": "Egypt",
+      "flag": "eg"
+    },
+    "IRN": {
+      "name": "IR Iran",
+      "flag": "ir"
+    },
+    "NZL": {
+      "name": "New Zealand",
+      "flag": "nz"
+    },
+    "ESP": {
+      "name": "Spain",
+      "flag": "es"
+    },
+    "CPV": {
+      "name": "Cabo Verde",
+      "flag": "cv"
+    },
+    "KSA": {
+      "name": "Saudi Arabia",
+      "flag": "sa"
+    },
+    "URU": {
+      "name": "Uruguay",
+      "flag": "uy"
+    },
+    "FRA": {
+      "name": "France",
+      "flag": "fr"
+    },
+    "SEN": {
+      "name": "Senegal",
+      "flag": "sn"
+    },
+    "IRQ": {
+      "name": "Iraq",
+      "flag": "iq"
+    },
+    "NOR": {
+      "name": "Norway",
+      "flag": "no"
+    },
+    "ARG": {
+      "name": "Argentina",
+      "flag": "ar"
+    },
+    "ALG": {
+      "name": "Algeria",
+      "flag": "dz"
+    },
+    "AUT": {
+      "name": "Austria",
+      "flag": "at"
+    },
+    "JOR": {
+      "name": "Jordan",
+      "flag": "jo"
+    },
+    "POR": {
+      "name": "Portugal",
+      "flag": "pt"
+    },
+    "COD": {
+      "name": "Congo DR",
+      "flag": "cd"
+    },
+    "UZB": {
+      "name": "Uzbekistan",
+      "flag": "uz"
+    },
+    "COL": {
+      "name": "Colombia",
+      "flag": "co"
+    },
+    "ENG": {
+      "name": "England",
+      "flag": "gb-eng"
+    },
+    "CRO": {
+      "name": "Croatia",
+      "flag": "hr"
+    },
+    "GHA": {
+      "name": "Ghana",
+      "flag": "gh"
+    },
+    "PAN": {
+      "name": "Panama",
+      "flag": "pa"
+    }
+  },
+  "groups": {
+    "A": [
+      "MEX",
+      "RSA",
+      "KOR",
+      "CZE"
+    ],
+    "B": [
+      "CAN",
+      "BIH",
+      "QAT",
+      "SUI"
+    ],
+    "C": [
+      "BRA",
+      "MAR",
+      "HAI",
+      "SCO"
+    ],
+    "D": [
+      "USA",
+      "PAR",
+      "AUS",
+      "TUR"
+    ],
+    "E": [
+      "GER",
+      "CUW",
+      "CIV",
+      "ECU"
+    ],
+    "F": [
+      "NED",
+      "JPN",
+      "SWE",
+      "TUN"
+    ],
+    "G": [
+      "BEL",
+      "EGY",
+      "IRN",
+      "NZL"
+    ],
+    "H": [
+      "ESP",
+      "CPV",
+      "KSA",
+      "URU"
+    ],
+    "I": [
+      "FRA",
+      "SEN",
+      "IRQ",
+      "NOR"
+    ],
+    "J": [
+      "ARG",
+      "ALG",
+      "AUT",
+      "JOR"
+    ],
+    "K": [
+      "POR",
+      "COD",
+      "UZB",
+      "COL"
+    ],
+    "L": [
+      "ENG",
+      "CRO",
+      "GHA",
+      "PAN"
+    ]
+  },
+  "matches": [
+    {
+      "no": "1",
+      "time": "15:00",
+      "team1": "MEX",
+      "team2": "RSA",
+      "group": "A",
+      "date": "11 June",
+      "venue": "MEXICO CITY",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "2",
+      "time": "22:00",
+      "team1": "KOR",
+      "team2": "CZE",
+      "group": "A",
+      "date": "11 June",
+      "venue": "GUADALAJARA",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "3",
+      "time": "15:00",
+      "team1": "CAN",
+      "team2": "BIH",
+      "group": "B",
+      "date": "12 June",
+      "venue": "TORONTO",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "5",
+      "time": "21:00",
+      "team1": "HAI",
+      "team2": "SCO",
+      "group": "C",
+      "date": "13 June",
+      "venue": "BOSTON",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "6",
+      "time": "00:00",
+      "team1": "AUS",
+      "team2": "TUR",
+      "group": "D",
+      "date": "13 June",
+      "venue": "VANCOUVER",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "7",
+      "time": "18:00",
+      "team1": "BRA",
+      "team2": "MAR",
+      "group": "C",
+      "date": "13 June",
+      "venue": "PHILADELPHIA",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "8",
+      "time": "15:00",
+      "team1": "QAT",
+      "team2": "SUI",
+      "group": "B",
+      "date": "13 June",
+      "venue": "SAN FRANCISCO BAY AREA",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "9",
+      "time": "19:00",
+      "team1": "CIV",
+      "team2": "ECU",
+      "group": "E",
+      "date": "14 June",
+      "venue": "PHILADELPHIA",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "10",
+      "time": "13:00",
+      "team1": "GER",
+      "team2": "CUW",
+      "group": "E",
+      "date": "14 June",
+      "venue": "HOUSTON",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "11",
+      "time": "16:00",
+      "team1": "NED",
+      "team2": "JPN",
+      "group": "F",
+      "date": "14 June",
+      "venue": "DALLAS",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "12",
+      "time": "22:00",
+      "team1": "SWE",
+      "team2": "TUN",
+      "group": "F",
+      "date": "14 June",
+      "venue": "MONTERREY",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "13",
+      "time": "18:00",
+      "team1": "KSA",
+      "team2": "URU",
+      "group": "H",
+      "date": "15 June",
+      "venue": "MIAMI",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "14",
+      "time": "12:00",
+      "team1": "ESP",
+      "team2": "CPV",
+      "group": "H",
+      "date": "15 June",
+      "venue": "ATLANTA",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "15",
+      "time": "21:00",
+      "team1": "USA",
+      "team2": "PAR",
+      "group": "D",
+      "date": "14 June",
+      "venue": "LOS ANGELES",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "15",
+      "time": "21:00",
+      "team1": "IRN",
+      "team2": "NZL",
+      "group": "G",
+      "date": "15 June",
+      "venue": "LOS ANGELES",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "16",
+      "time": "15:00",
+      "team1": "BEL",
+      "team2": "EGY",
+      "group": "G",
+      "date": "15 June",
+      "venue": "SEATTLE",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "17",
+      "time": "15:00",
+      "team1": "FRA",
+      "team2": "SEN",
+      "group": "I",
+      "date": "16 June",
+      "venue": "PHILADELPHIA",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "18",
+      "time": "18:00",
+      "team1": "IRQ",
+      "team2": "NOR",
+      "group": "I",
+      "date": "16 June",
+      "venue": "BOSTON",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "19",
+      "time": "21:00",
+      "team1": "ARG",
+      "team2": "ALG",
+      "group": "J",
+      "date": "16 June",
+      "venue": "KANSAS CITY",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "20",
+      "time": "00:00",
+      "team1": "AUT",
+      "team2": "JOR",
+      "group": "J",
+      "date": "16 June",
+      "venue": "SAN FRANCISCO BAY AREA",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "21",
+      "time": "19:00",
+      "team1": "GHA",
+      "team2": "PAN",
+      "group": "L",
+      "date": "17 June",
+      "venue": "TORONTO",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "22",
+      "time": "16:00",
+      "team1": "ENG",
+      "team2": "CRO",
+      "group": "L",
+      "date": "17 June",
+      "venue": "DALLAS",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "24",
+      "time": "22:00",
+      "team1": "UZB",
+      "team2": "COL",
+      "group": "K",
+      "date": "17 June",
+      "venue": "MEXICO CITY",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "25",
+      "time": "12:00",
+      "team1": "CZE",
+      "team2": "RSA",
+      "group": "A",
+      "date": "18 June",
+      "venue": "ATLANTA",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "26",
+      "time": "15:00",
+      "team1": "SUI",
+      "team2": "BIH",
+      "group": "B",
+      "date": "18 June",
+      "venue": "LOS ANGELES",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "27",
+      "time": "18:00",
+      "team1": "CAN",
+      "team2": "QAT",
+      "group": "B",
+      "date": "18 June",
+      "venue": "VANCOUVER",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "28",
+      "time": "21:00",
+      "team1": "MEX",
+      "team2": "KOR",
+      "group": "A",
+      "date": "18 June",
+      "venue": "GUADALAJARA",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "29",
+      "time": "20:30",
+      "team1": "BRA",
+      "team2": "HAI",
+      "group": "C",
+      "date": "19 June",
+      "venue": "PHILADELPHIA",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "30",
+      "time": "18:00",
+      "team1": "SCO",
+      "team2": "MAR",
+      "group": "C",
+      "date": "19 June",
+      "venue": "BOSTON",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "31",
+      "time": "23:00",
+      "team1": "TUR",
+      "team2": "PAR",
+      "group": "D",
+      "date": "19 June",
+      "venue": "SAN FRANCISCO BAY AREA",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "32",
+      "time": "15:00",
+      "team1": "USA",
+      "team2": "AUS",
+      "group": "D",
+      "date": "19 June",
+      "venue": "SEATTLE",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "33",
+      "time": "16:00",
+      "team1": "GER",
+      "team2": "CIV",
+      "group": "E",
+      "date": "20 June",
+      "venue": "TORONTO",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "34",
+      "time": "20:00",
+      "team1": "ECU",
+      "team2": "CUW",
+      "group": "E",
+      "date": "20 June",
+      "venue": "KANSAS CITY",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "35",
+      "time": "13:00",
+      "team1": "NED",
+      "team2": "SWE",
+      "group": "F",
+      "date": "20 June",
+      "venue": "HOUSTON",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "36",
+      "time": "00:00",
+      "team1": "TUN",
+      "team2": "JPN",
+      "group": "F",
+      "date": "20 June",
+      "venue": "MONTERREY",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "37",
+      "time": "18:00",
+      "team1": "URU",
+      "team2": "CPV",
+      "group": "H",
+      "date": "21 June",
+      "venue": "MIAMI",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "38",
+      "time": "12:00",
+      "team1": "ESP",
+      "team2": "KSA",
+      "group": "H",
+      "date": "21 June",
+      "venue": "ATLANTA",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "39",
+      "time": "15:00",
+      "team1": "BEL",
+      "team2": "IRN",
+      "group": "G",
+      "date": "21 June",
+      "venue": "LOS ANGELES",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "40",
+      "time": "21:00",
+      "team1": "NZL",
+      "team2": "EGY",
+      "group": "G",
+      "date": "21 June",
+      "venue": "VANCOUVER",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "41",
+      "time": "20:00",
+      "team1": "NOR",
+      "team2": "SEN",
+      "group": "I",
+      "date": "22 June",
+      "venue": "PHILADELPHIA",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "42",
+      "time": "17:00",
+      "team1": "FRA",
+      "team2": "IRQ",
+      "group": "I",
+      "date": "22 June",
+      "venue": "PHILADELPHIA",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "43",
+      "time": "13:00",
+      "team1": "ARG",
+      "team2": "AUT",
+      "group": "J",
+      "date": "22 June",
+      "venue": "DALLAS",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "44",
+      "time": "23:00",
+      "team1": "JOR",
+      "team2": "ALG",
+      "group": "J",
+      "date": "22 June",
+      "venue": "SAN FRANCISCO BAY AREA",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "45",
+      "time": "16:00",
+      "team1": "ENG",
+      "team2": "GHA",
+      "group": "L",
+      "date": "23 June",
+      "venue": "BOSTON",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "46",
+      "time": "19:00",
+      "team1": "PAN",
+      "team2": "CRO",
+      "group": "L",
+      "date": "23 June",
+      "venue": "TORONTO",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "47",
+      "time": "13:00",
+      "team1": "POR",
+      "team2": "UZB",
+      "group": "K",
+      "date": "23 June",
+      "venue": "HOUSTON",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "48",
+      "time": "22:00",
+      "team1": "COL",
+      "team2": "COD",
+      "group": "K",
+      "date": "23 June",
+      "venue": "GUADALAJARA",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "49",
+      "time": "18:00",
+      "team1": "SCO",
+      "team2": "BRA",
+      "group": "C",
+      "date": "24 June",
+      "venue": "MIAMI",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "50",
+      "time": "18:00",
+      "team1": "MAR",
+      "team2": "HAI",
+      "group": "C",
+      "date": "24 June",
+      "venue": "ATLANTA",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "51",
+      "time": "15:00",
+      "team1": "SUI",
+      "team2": "CAN",
+      "group": "B",
+      "date": "24 June",
+      "venue": "VANCOUVER",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "52",
+      "time": "15:00",
+      "team1": "BIH",
+      "team2": "QAT",
+      "group": "B",
+      "date": "24 June",
+      "venue": "SEATTLE",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "54",
+      "time": "21:00",
+      "team1": "RSA",
+      "team2": "KOR",
+      "group": "A",
+      "date": "24 June",
+      "venue": "MONTERREY",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "55",
+      "time": "16:00",
+      "team1": "CUW",
+      "team2": "CIV",
+      "group": "E",
+      "date": "25 June",
+      "venue": "PHILADELPHIA",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "56",
+      "time": "16:00",
+      "team1": "ECU",
+      "team2": "GER",
+      "group": "E",
+      "date": "25 June",
+      "venue": "PHILADELPHIA",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "57",
+      "time": "19:00",
+      "team1": "JPN",
+      "team2": "SWE",
+      "group": "F",
+      "date": "25 June",
+      "venue": "DALLAS",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "58",
+      "time": "19:00",
+      "team1": "TUN",
+      "team2": "NED",
+      "group": "F",
+      "date": "25 June",
+      "venue": "KANSAS CITY",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "59",
+      "time": "22:00",
+      "team1": "TUR",
+      "team2": "USA",
+      "group": "D",
+      "date": "25 June",
+      "venue": "LOS ANGELES",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "60",
+      "time": "22:00",
+      "team1": "PAR",
+      "team2": "AUS",
+      "group": "D",
+      "date": "25 June",
+      "venue": "SAN FRANCISCO BAY AREA",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "61",
+      "time": "15:00",
+      "team1": "NOR",
+      "team2": "FRA",
+      "group": "I",
+      "date": "26 June",
+      "venue": "BOSTON",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "62",
+      "time": "15:00",
+      "team1": "SEN",
+      "team2": "IRQ",
+      "group": "I",
+      "date": "26 June",
+      "venue": "TORONTO",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "63",
+      "time": "23:00",
+      "team1": "EGY",
+      "team2": "IRN",
+      "group": "G",
+      "date": "26 June",
+      "venue": "SEATTLE",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "64",
+      "time": "23:00",
+      "team1": "NZL",
+      "team2": "BEL",
+      "group": "G",
+      "date": "26 June",
+      "venue": "VANCOUVER",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "65",
+      "time": "20:00",
+      "team1": "CPV",
+      "team2": "KSA",
+      "group": "H",
+      "date": "26 June",
+      "venue": "HOUSTON",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "66",
+      "time": "20:00",
+      "team1": "URU",
+      "team2": "ESP",
+      "group": "H",
+      "date": "26 June",
+      "venue": "GUADALAJARA",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "67",
+      "time": "17:00",
+      "team1": "PAN",
+      "team2": "ENG",
+      "group": "L",
+      "date": "27 June",
+      "venue": "PHILADELPHIA",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "68",
+      "time": "17:00",
+      "team1": "CRO",
+      "team2": "GHA",
+      "group": "L",
+      "date": "27 June",
+      "venue": "PHILADELPHIA",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "69",
+      "time": "22:00",
+      "team1": "ALG",
+      "team2": "AUT",
+      "group": "J",
+      "date": "27 June",
+      "venue": "KANSAS CITY",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "70",
+      "time": "22:00",
+      "team1": "JOR",
+      "team2": "ARG",
+      "group": "J",
+      "date": "27 June",
+      "venue": "DALLAS",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "71",
+      "time": "19:30",
+      "team1": "COL",
+      "team2": "POR",
+      "group": "K",
+      "date": "27 June",
+      "venue": "MIAMI",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "72",
+      "time": "19:30",
+      "team1": "COD",
+      "team2": "UZB",
+      "group": "K",
+      "date": "27 June",
+      "venue": "ATLANTA",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "73",
+      "time": "15:00",
+      "team1": "2A",
+      "team2": "2B",
+      "group": "",
+      "date": "28 June",
+      "venue": "LOS ANGELES",
+      "stage": "Knockout",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "74",
+      "time": "16:30",
+      "team1": "1E",
+      "team2": "3",
+      "group": "",
+      "date": "29 June",
+      "venue": "BOSTON",
+      "stage": "Knockout",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "75",
+      "time": "21:00",
+      "team1": "1F",
+      "team2": "2C",
+      "group": "",
+      "date": "29 June",
+      "venue": "MONTERREY",
+      "stage": "Knockout",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "76",
+      "time": "13:00",
+      "team1": "1C",
+      "team2": "2F",
+      "group": "",
+      "date": "29 June",
+      "venue": "HOUSTON",
+      "stage": "Knockout",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "77",
+      "time": "17:00",
+      "team1": "1I",
+      "team2": "3",
+      "group": "",
+      "date": "30 June",
+      "venue": "PHILADELPHIA",
+      "stage": "Knockout",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "78",
+      "time": "13:00",
+      "team1": "2E",
+      "team2": "2I",
+      "group": "",
+      "date": "30 June",
+      "venue": "DALLAS",
+      "stage": "Knockout",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "79",
+      "time": "21:00",
+      "team1": "1A",
+      "team2": "3",
+      "group": "",
+      "date": "30 June",
+      "venue": "MEXICO CITY",
+      "stage": "Knockout",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "80",
+      "time": "12:00",
+      "team1": "1L",
+      "team2": "3",
+      "group": "",
+      "date": "1 July",
+      "venue": "ATLANTA",
+      "stage": "Knockout",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "81",
+      "time": "20:00",
+      "team1": "1D",
+      "team2": "3",
+      "group": "",
+      "date": "1 July",
+      "venue": "SAN FRANCISCO BAY AREA",
+      "stage": "Knockout",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "82",
+      "time": "16:00",
+      "team1": "1G",
+      "team2": "3",
+      "group": "",
+      "date": "1 July",
+      "venue": "SEATTLE",
+      "stage": "Knockout",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "83",
+      "time": "19:00",
+      "team1": "2K",
+      "team2": "2L",
+      "group": "",
+      "date": "2 July",
+      "venue": "TORONTO",
+      "stage": "Knockout",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "84",
+      "time": "15:00",
+      "team1": "1H",
+      "team2": "2J",
+      "group": "",
+      "date": "2 July",
+      "venue": "LOS ANGELES",
+      "stage": "Knockout",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "85",
+      "time": "23:00",
+      "team1": "1B",
+      "team2": "3",
+      "group": "",
+      "date": "2 July",
+      "venue": "VANCOUVER",
+      "stage": "Knockout",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "86",
+      "time": "18:00",
+      "team1": "1J",
+      "team2": "2H",
+      "group": "",
+      "date": "3 July",
+      "venue": "MIAMI",
+      "stage": "Knockout",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "87",
+      "time": "21:30",
+      "team1": "1K",
+      "team2": "3",
+      "group": "",
+      "date": "3 July",
+      "venue": "KANSAS CITY",
+      "stage": "Knockout",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "88",
+      "time": "14:00",
+      "team1": "2D",
+      "team2": "2G",
+      "group": "",
+      "date": "3 July",
+      "venue": "DALLAS",
+      "stage": "Knockout",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "89",
+      "time": "17:00",
+      "team1": "W74",
+      "team2": "W77",
+      "group": "",
+      "date": "4 July",
+      "venue": "PHILADELPHIA",
+      "stage": "Knockout",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "90",
+      "time": "13:00",
+      "team1": "W73",
+      "team2": "W75",
+      "group": "",
+      "date": "4 July",
+      "venue": "HOUSTON",
+      "stage": "Knockout",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "91",
+      "time": "16:00",
+      "team1": "W76",
+      "team2": "W78",
+      "group": "",
+      "date": "5 July",
+      "venue": "PHILADELPHIA",
+      "stage": "Knockout",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "92",
+      "time": "20:00",
+      "team1": "W79",
+      "team2": "W80",
+      "group": "",
+      "date": "5 July",
+      "venue": "MEXICO CITY",
+      "stage": "Knockout",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "93",
+      "time": "15:00",
+      "team1": "W83",
+      "team2": "W84",
+      "group": "",
+      "date": "6 July",
+      "venue": "DALLAS",
+      "stage": "Knockout",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "94",
+      "time": "20:00",
+      "team1": "W81",
+      "team2": "W82",
+      "group": "",
+      "date": "6 July",
+      "venue": "SEATTLE",
+      "stage": "Knockout",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "95",
+      "time": "12:00",
+      "team1": "W86",
+      "team2": "W88",
+      "group": "",
+      "date": "7 July",
+      "venue": "ATLANTA",
+      "stage": "Knockout",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "96",
+      "time": "16:00",
+      "team1": "W85",
+      "team2": "W87",
+      "group": "",
+      "date": "7 July",
+      "venue": "VANCOUVER",
+      "stage": "Knockout",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "97",
+      "time": "16:00",
+      "team1": "W89",
+      "team2": "W90",
+      "group": "",
+      "date": "9 July",
+      "venue": "BOSTON",
+      "stage": "Knockout",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "98",
+      "time": "15:00",
+      "team1": "W93",
+      "team2": "W94",
+      "group": "",
+      "date": "10 July",
+      "venue": "LOS ANGELES",
+      "stage": "Knockout",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "99",
+      "time": "17:00",
+      "team1": "W91",
+      "team2": "W92",
+      "group": "",
+      "date": "11 July",
+      "venue": "MIAMI",
+      "stage": "Knockout",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "100",
+      "time": "21:00",
+      "team1": "W95",
+      "team2": "W96",
+      "group": "",
+      "date": "11 July",
+      "venue": "KANSAS CITY",
+      "stage": "Knockout",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "101",
+      "time": "15:00",
+      "team1": "W97",
+      "team2": "W98",
+      "group": "",
+      "date": "14 July",
+      "venue": "DALLAS",
+      "stage": "Knockout",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "102",
+      "time": "15:00",
+      "team1": "W99",
+      "team2": "W100",
+      "group": "",
+      "date": "15 July",
+      "venue": "ATLANTA",
+      "stage": "Knockout",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "",
+      "time": "13:00",
+      "team1": "POR",
+      "team2": "COD",
+      "group": "K",
+      "date": "18 June",
+      "venue": "HOUSTON",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "",
+      "time": "",
+      "team1": "CZE",
+      "team2": "MEX",
+      "group": "A",
+      "date": "20 June",
+      "venue": "MEXICO CITY",
+      "stage": "Group Stage",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "103",
+      "time": "17:00",
+      "team1": "RU101",
+      "team2": "RU102",
+      "group": "",
+      "date": "18 July",
+      "venue": "MIAMI",
+      "stage": "Bronze Final",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    },
+    {
+      "no": "104",
+      "time": "15:00",
+      "team1": "Winner SF1",
+      "team2": "Winner SF2",
+      "group": "",
+      "date": "19 July",
+      "venue": "NEW YORK NEW JERSEY",
+      "stage": "Final",
+      "status": "scheduled",
+      "score1": null,
+      "score2": null
+    }
+  ]
+}
