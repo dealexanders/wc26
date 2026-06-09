@@ -1,4 +1,3 @@
-```javascript
 let DATA;
 
 const API_BASE =
@@ -822,4 +821,3 @@ async function initialize() {
 }
 
 initialize();
-```
