@@ -2,16 +2,6 @@
 
 All editable site and tournament data lives in [`data.json`](data.json). The HTML is only the application shell, JavaScript renders the stored data, and the theme section of the JSON supplies the CSS custom properties.
 
-## Preview locally
-
-Because the browser loads `data.json` with `fetch`, serve the directory over HTTP instead of opening `index.html` directly:
-
-```sh
-python3 -m http.server 8000
-```
-
-Then open <http://localhost:8000>.
-
 ## Update tournament data
 
 - `site`, `navigation`, and `content` control labels and copy shown on the site.
