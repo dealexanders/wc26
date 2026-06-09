@@ -4,7 +4,7 @@ tg.ready();
 tg.expand();
 
 const API_BASE =
-  'https://api.wc26.example.com/api/v1';
+  'https://serwer2687458.hosting-home.pl/wc26-api/public/api/v1';
 
 const initData = tg.initData;
 
