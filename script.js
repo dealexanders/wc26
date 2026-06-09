@@ -1,10 +1,26 @@
+```javascript
 let DATA;
 
-const $ = (selector, root = document) => root.querySelector(selector);
-const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
-const escapeHtml = (value = '') => String(value).replace(/[&<>'"]/g, character => ({
-  '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
-})[character]);
+const API_BASE =
+  'https://serwer2687458.hosting-home.pl/wc26-api/public/api/v1/';
+
+const $ = (selector, root = document) =>
+  root.querySelector(selector);
+
+const $$ = (selector, root = document) =>
+  [...root.querySelectorAll(selector)];
+
+const escapeHtml = (value = '') =>
+  String(value).replace(
+    /[&<>'"]/g,
+    character => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      "'": '&#39;',
+      '"': '&quot;'
+    })[character]
+  );
 
 const routes = {
   home: renderHome,
@@ -13,79 +29,348 @@ const routes = {
 };
 
 const matchNumber = match =>
-  Number.parseInt(match.no, 10) || Number.MAX_SAFE_INTEGER;
+  Number.parseInt(match.no, 10) ||
+  Number.MAX_SAFE_INTEGER;
 
 const matchesByNumber = matches =>
-  [...matches].sort((a, b) => matchNumber(a) - matchNumber(b));
+  [...matches].sort(
+    (a, b) =>
+      matchNumber(a) - matchNumber(b)
+  );
 
-function applyTheme(theme) {
-  Object.entries(theme).forEach(([name, value]) => {
-    if (typeof value === 'string') {
-      document.documentElement.style.setProperty(`--${name}`, value);
+async function fetchJson(path, options = {}) {
+  const response = await fetch(
+    `${API_BASE}/${path}`,
+    options
+  );
+
+  let body;
+
+  try {
+    body = await response.json();
+  } catch (error) {
+    throw new Error(
+      `Invalid JSON response from ${path}`
+    );
+  }
+
+  if (!response.ok) {
+    throw new Error(
+      body?.error?.message ||
+      `HTTP ${response.status}`
+    );
+  }
+
+  return body;
+}
+
+function parseUtcDate(value) {
+  if (!value) {
+    return null;
+  }
+
+  const normalized = String(value)
+    .replace(' ', 'T')
+    .replace(/Z$/, '');
+
+  const date = new Date(`${normalized}Z`);
+
+  return Number.isNaN(date.getTime())
+    ? null
+    : date;
+}
+
+function formatMatchDate(value) {
+  const date = parseUtcDate(value);
+
+  if (!date) {
+    return '';
+  }
+
+  return new Intl.DateTimeFormat(
+    'en-US',
+    {
+      timeZone: 'America/New_York',
+      day: 'numeric',
+      month: 'long'
     }
-  });
+  ).format(date);
+}
+
+function formatMatchTime(value) {
+  const date = parseUtcDate(value);
+
+  if (!date) {
+    return '';
+  }
+
+  return new Intl.DateTimeFormat(
+    'en-GB',
+    {
+      timeZone: 'America/New_York',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    }
+  ).format(date);
+}
+
+function formatStage(stage = '') {
+  const labels = {
+    GROUP_STAGE: 'Group Stage',
+    ROUND_OF_32: 'Round of 32',
+    ROUND_OF_16: 'Round of 16',
+    QUARTER_FINAL: 'Quarter-final',
+    SEMI_FINAL: 'Semi-final',
+    BRONZE_FINAL: 'Bronze Final',
+    FINAL: 'Final'
+  };
+
+  return labels[stage] || stage;
+}
+
+function normalizeApiData(
+  bootstrap,
+  apiMatches
+) {
+  const teams = {};
+
+  for (const item of bootstrap.teams || []) {
+    teams[item.code] = {
+      id: Number(item.id),
+      name: item.name,
+      flag: item.flag_code
+    };
+  }
+
+  const groups = {};
+
+  for (const item of bootstrap.groups || []) {
+    const groupCode = item.group_code;
+
+    if (!groups[groupCode]) {
+      groups[groupCode] = [];
+    }
+
+    groups[groupCode].push(
+      item.team_code
+    );
+  }
+
+  const matches = (apiMatches || []).map(
+    match => {
+      const kickoffAtUtc =
+        match.kickoff_at_utc || '';
+
+      return {
+        id: Number(match.id),
+
+        no: String(
+          match.match_number ?? ''
+        ),
+
+        stage: formatStage(
+          match.stage
+        ),
+
+        group:
+          match.group_code || '',
+
+        kickoffAtUtc,
+
+        date: formatMatchDate(
+          kickoffAtUtc
+        ),
+
+        time: formatMatchTime(
+          kickoffAtUtc
+        ),
+
+        team1:
+          match.home_team_code ||
+          match.home_placeholder ||
+          'TBC',
+
+        team2:
+          match.away_team_code ||
+          match.away_placeholder ||
+          'TBC',
+
+        venue:
+          match.venue_name ||
+          match.venue_city ||
+          'TBC',
+
+        status:
+          match.status || 'SCHEDULED',
+
+        score1:
+          match.home_score === null ||
+          match.home_score === undefined
+            ? null
+            : Number(match.home_score),
+
+        score2:
+          match.away_score === null ||
+          match.away_score === undefined
+            ? null
+            : Number(match.away_score),
+
+        totalVotes: Number(
+          match.total_votes || 0
+        ),
+
+        voteResults: {
+          homeWin: Number(
+            match.home_win_votes || 0
+          ),
+
+          draw: Number(
+            match.draw_votes || 0
+          ),
+
+          awayWin: Number(
+            match.away_win_votes || 0
+          )
+        }
+      };
+    }
+  );
+
+  return {
+    site: bootstrap.site || {},
+    navigation:
+      bootstrap.navigation || [],
+    content: bootstrap.content || {},
+    theme: bootstrap.theme || {},
+    teams,
+    groups,
+    matches
+  };
+}
+
+function applyTheme(theme = {}) {
+  Object.entries(theme).forEach(
+    ([name, value]) => {
+      if (typeof value === 'string') {
+        document.documentElement.style
+          .setProperty(
+            `--${name}`,
+            value
+          );
+      }
+    }
+  );
 }
 
 function renderShell() {
   const { site, navigation } = DATA;
 
-  const visibleNavigation = navigation.filter(item => item.id !== 'groups');
+  const visibleNavigation =
+    navigation.filter(
+      item => item.id !== 'groups'
+    );
 
-  document.documentElement.lang = site.language;
-  document.title = site.title;
+  document.documentElement.lang =
+    site.language || 'en';
+
+  document.title =
+    site.title || 'Mundial 2026';
 
   $('#brand').innerHTML = `
-    <span class="brandCup">${escapeHtml(site.brandIcon)}</span>
-    <span>${escapeHtml(site.title)}</span>
+    <span class="brandCup">
+      ${escapeHtml(site.brandIcon || '🏆')}
+    </span>
+
+    <span>
+      ${escapeHtml(site.title || 'Mundial 2026')}
+    </span>
   `;
 
-  $('#nav').innerHTML = visibleNavigation
-    .map(item => `
-      <a
-        data-page="${escapeHtml(item.id)}"
-        href="#${escapeHtml(item.id)}"
-      >
-        ${escapeHtml(item.label)}
-      </a>
-    `)
-    .join('');
+  $('#nav').innerHTML =
+    visibleNavigation
+      .map(item => `
+        <a
+          data-page="${escapeHtml(item.id)}"
+          href="#${escapeHtml(item.id)}"
+        >
+          ${escapeHtml(item.label)}
+        </a>
+      `)
+      .join('');
 
-  $('#nav').setAttribute('aria-label', site.navigationLabel);
-  $('#footer').textContent = site.footer;
+  $('#nav').setAttribute(
+    'aria-label',
+    site.navigationLabel ||
+    'Primary navigation'
+  );
+
+  $('#footer').textContent =
+    site.footer || '';
 }
 
 function flag(code) {
-  const tournamentTeam = DATA.teams[code];
+  const tournamentTeam =
+    DATA.teams[code];
 
-  return tournamentTeam
-    ? `<span class="fi fi-${escapeHtml(tournamentTeam.flag)}"></span>`
-    : `<span class="flagFallback">${escapeHtml(code)}</span>`;
+  return tournamentTeam?.flag
+    ? `
+      <span
+        class="fi fi-${escapeHtml(
+          tournamentTeam.flag
+        )}"
+      ></span>
+    `
+    : `
+      <span class="flagFallback">
+        ${escapeHtml(code)}
+      </span>
+    `;
 }
 
 function team(code) {
-  const tournamentTeam = DATA.teams[code];
+  const tournamentTeam =
+    DATA.teams[code];
 
   return tournamentTeam
     ? `
       <span class="team">
         ${flag(code)}
-        <b>${escapeHtml(tournamentTeam.name)}</b>
-        <small>${escapeHtml(code)}</small>
+
+        <b>
+          ${escapeHtml(
+            tournamentTeam.name
+          )}
+        </b>
+
+        <small>
+          ${escapeHtml(code)}
+        </small>
       </span>
     `
     : `
       <span class="team placeholder">
-        <b>${escapeHtml(code)}</b>
+        <b>
+          ${escapeHtml(code || 'TBC')}
+        </b>
       </span>
     `;
 }
 
 function go() {
-  const requestedPage = location.hash.replace('#', '') || 'home';
-  const page = routes[requestedPage] ? requestedPage : 'home';
+  const requestedPage =
+    location.hash.replace('#', '') ||
+    'home';
+
+  const page = routes[requestedPage]
+    ? requestedPage
+    : 'home';
 
   $$('.nav a').forEach(link => {
-    link.classList.toggle('active', link.dataset.page === page);
+    link.classList.toggle(
+      'active',
+      link.dataset.page === page
+    );
   });
 
   routes[page]();
@@ -97,50 +382,89 @@ function go() {
 }
 
 function groupCards(className) {
-  const groupLabel = DATA.content.groups.groupLabel;
+  const groupLabel =
+    DATA.content.groups?.groupLabel ||
+    'Group';
 
   return Object.entries(DATA.groups)
     .map(([group, teamCodes]) => `
       <article
         class="${className}"
-        style="--group-accent:${escapeHtml(DATA.theme.groupColors[group])}"
+        style="--group-accent:${escapeHtml(
+          DATA.theme.groupColors?.[group] ||
+          DATA.theme.line ||
+          '#272b38'
+        )}"
       >
         ${
           className === 'groupCard'
-            ? `<div class="groupBadge">${escapeHtml(group)}</div>`
+            ? `
+              <div class="groupBadge">
+                ${escapeHtml(group)}
+              </div>
+            `
             : ''
         }
 
-        <h3>${escapeHtml(groupLabel)} ${escapeHtml(group)}</h3>
+        <h3>
+          ${escapeHtml(groupLabel)}
+          ${escapeHtml(group)}
+        </h3>
 
-        ${teamCodes.map(team).join('')}
+        ${teamCodes
+          .map(team)
+          .join('')}
       </article>
     `)
     .join('');
 }
 
 function renderHome() {
-  const home = DATA.content.home;
+  const home =
+    DATA.content.home || {};
 
   $('#app').innerHTML = `
     <section class="hero">
       <div>
-        <p class="eyebrow">${escapeHtml(home.eyebrow)}</p>
-        <h1>${escapeHtml(home.heading)}</h1>
+        <p class="eyebrow">
+          ${escapeHtml(home.eyebrow)}
+        </p>
+
+        <h1>
+          ${escapeHtml(
+            home.heading ||
+            DATA.site.title
+          )}
+        </h1>
 
         <div class="stats">
-          ${home.stats
-            .map(stat => `<span>${escapeHtml(stat)}</span>`)
+          ${(home.stats || [])
+            .map(stat => `
+              <span>
+                ${escapeHtml(stat)}
+              </span>
+            `)
             .join('')}
         </div>
       </div>
 
       <div
         class="trophy"
-        aria-label="${escapeHtml(home.trophyLabel)}"
+        aria-label="${escapeHtml(
+          home.trophyLabel || 'trophy'
+        )}"
       >
-        <div class="globe">${escapeHtml(home.trophyIcon)}</div>
-        <div class="base">${escapeHtml(home.trophyBase)}</div>
+        <div class="globe">
+          ${escapeHtml(
+            home.trophyIcon || '🏆'
+          )}
+        </div>
+
+        <div class="base">
+          ${escapeHtml(
+            home.trophyBase || '26'
+          )}
+        </div>
       </div>
     </section>
 
@@ -151,103 +475,184 @@ function renderHome() {
 }
 
 function renderGames() {
-  const games = DATA.content.games;
+  const games =
+    DATA.content.games || {};
 
   $('#app').innerHTML = `
-    <h2>${escapeHtml(games.heading)}</h2>
-    <p class="sub">${escapeHtml(games.description)}</p>
+    <h2>
+      ${escapeHtml(
+        games.heading || 'Games'
+      )}
+    </h2>
+
+    <p class="sub">
+      ${escapeHtml(games.description)}
+    </p>
 
     <div class="filters">
       <input
         id="q"
-        placeholder="${escapeHtml(games.searchPlaceholder)}"
+        placeholder="${escapeHtml(
+          games.searchPlaceholder ||
+          'Search team, city, date...'
+        )}"
       >
 
       <select id="groupFilter">
         <option value="">
-          ${escapeHtml(games.allFilterLabel)}
+          ${escapeHtml(
+            games.allFilterLabel ||
+            'All groups/stages'
+          )}
         </option>
 
         ${Object.keys(DATA.groups)
-          .map(group => `<option>${escapeHtml(group)}</option>`)
+          .map(group => `
+            <option value="${escapeHtml(group)}">
+              ${escapeHtml(group)}
+            </option>
+          `)
           .join('')}
 
-        <option>
-          ${escapeHtml(games.knockoutFilterLabel)}
+        <option value="knockout">
+          ${escapeHtml(
+            games.knockoutFilterLabel ||
+            'Knockout'
+          )}
         </option>
       </select>
     </div>
 
-    <div id="gameGrid" class="gameGrid"></div>
+    <div
+      id="gameGrid"
+      class="gameGrid"
+    ></div>
   `;
 
   const draw = () => {
-    const query = $('#q').value.toLowerCase();
-    const groupFilter = $('#groupFilter').value;
-
-    const filteredMatches = DATA.matches.filter(match => {
-      const teamNames = [match.team1, match.team2].map(
-        code => DATA.teams[code]?.name || code
-      );
-
-      const searchableText = [
-        ...Object.values(match),
-        ...teamNames
-      ]
-        .join(' ')
+    const query =
+      $('#q').value
+        .trim()
         .toLowerCase();
 
-      const matchesGroup =
-        !groupFilter ||
-        match.group === groupFilter ||
-        (
-          groupFilter === games.knockoutFilterLabel &&
-          !match.group
+    const groupFilter =
+      $('#groupFilter').value;
+
+    const filteredMatches =
+      DATA.matches.filter(match => {
+        const teamNames = [
+          match.team1,
+          match.team2
+        ].map(
+          code =>
+            DATA.teams[code]?.name ||
+            code
         );
 
-      return (
-        (!query || searchableText.includes(query)) &&
-        matchesGroup
+        const searchableText = [
+          match.no,
+          match.stage,
+          match.group,
+          match.date,
+          match.time,
+          match.venue,
+          ...teamNames
+        ]
+          .join(' ')
+          .toLowerCase();
+
+        const isKnockout =
+          !match.group;
+
+        const matchesGroup =
+          !groupFilter ||
+          match.group === groupFilter ||
+          (
+            groupFilter === 'knockout' &&
+            isKnockout
+          );
+
+        return (
+          (
+            !query ||
+            searchableText.includes(query)
+          ) &&
+          matchesGroup
+        );
+      });
+
+    const sortedMatches =
+      matchesByNumber(
+        filteredMatches
       );
-    });
 
-    const sortedMatches = matchesByNumber(filteredMatches);
-
-    $('#gameGrid').innerHTML = sortedMatches
-      .map(matchCard)
-      .join('');
+    $('#gameGrid').innerHTML =
+      sortedMatches
+        .map(matchCard)
+        .join('');
   };
 
-  $('#q').addEventListener('input', draw);
-  $('#groupFilter').addEventListener('change', draw);
+  $('#q').addEventListener(
+    'input',
+    draw
+  );
+
+  $('#groupFilter').addEventListener(
+    'change',
+    draw
+  );
 
   draw();
 }
 
 function score(match) {
-  if (match.score1 === null || match.score2 === null) {
-    return DATA.content.games.versusLabel;
+  if (
+    match.score1 === null ||
+    match.score2 === null
+  ) {
+    return (
+      DATA.content.games?.versusLabel ||
+      'v'
+    );
   }
 
-  return `${escapeHtml(match.score1)}–${escapeHtml(match.score2)}`;
+  return `
+    ${escapeHtml(match.score1)}
+    –
+    ${escapeHtml(match.score2)}
+  `;
 }
 
 function matchCard(match) {
-  const games = DATA.content.games;
+  const games =
+    DATA.content.games || {};
+
+  const groupLabel =
+    DATA.content.groups?.groupLabel ||
+    'Group';
 
   return `
     <article class="matchCard">
       <div class="matchMeta">
         <span>
-          #${escapeHtml(match.no || games.unknownMatchNumber)}
+          #${escapeHtml(
+            match.no ||
+            games.unknownMatchNumber ||
+            '—'
+          )}
         </span>
 
-        <span>${escapeHtml(match.stage)}</span>
+        <span>
+          ${escapeHtml(match.stage)}
+        </span>
 
         <span>
           ${
             match.group
-              ? `${escapeHtml(DATA.content.groups.groupLabel)} ${escapeHtml(match.group)}`
+              ? `
+                ${escapeHtml(groupLabel)}
+                ${escapeHtml(match.group)}
+              `
               : ''
           }
         </span>
@@ -255,20 +660,33 @@ function matchCard(match) {
 
       <div class="versus">
         ${team(match.team1)}
-        <strong>${score(match)}</strong>
+
+        <strong>
+          ${score(match)}
+        </strong>
+
         ${team(match.team2)}
       </div>
 
       <div class="where">
-        <span>${escapeHtml(match.date)}</span>
-
         <span>
-          ${escapeHtml(match.time)}
-          ${escapeHtml(DATA.content.timeZoneLabel)}
+          ${escapeHtml(match.date)}
         </span>
 
         <span>
-          ${escapeHtml(match.venue || games.venueTbc)}
+          ${escapeHtml(match.time)}
+          ${escapeHtml(
+            DATA.content.timeZoneLabel ||
+            'ET'
+          )}
+        </span>
+
+        <span>
+          ${escapeHtml(
+            match.venue ||
+            games.venueTbc ||
+            'TBC'
+          )}
         </span>
       </div>
     </article>
@@ -276,19 +694,45 @@ function matchCard(match) {
 }
 
 function renderTable() {
-  const table = DATA.content.table;
-  const sortedMatches = matchesByNumber(DATA.matches);
+  const table =
+    DATA.content.table || {};
+
+  const sortedMatches =
+    matchesByNumber(DATA.matches);
+
+  const columns =
+    table.columns || [
+      '#',
+      'Date',
+      'Time',
+      'Location',
+      'Stage',
+      'Group',
+      'Game'
+    ];
 
   $('#app').innerHTML = `
-    <h2>${escapeHtml(table.heading)}</h2>
-    <p class="sub">${escapeHtml(table.description)}</p>
+    <h2>
+      ${escapeHtml(
+        table.heading ||
+        'Schedule table'
+      )}
+    </h2>
+
+    <p class="sub">
+      ${escapeHtml(table.description)}
+    </p>
 
     <div class="tableWrap">
       <table>
         <thead>
           <tr>
-            ${table.columns
-              .map(column => `<th>${escapeHtml(column)}</th>`)
+            ${columns
+              .map(column => `
+                <th>
+                  ${escapeHtml(column)}
+                </th>
+              `)
               .join('')}
           </tr>
         </thead>
@@ -297,15 +741,37 @@ function renderTable() {
           ${sortedMatches
             .map(match => `
               <tr>
-                <td>${escapeHtml(match.no)}</td>
-                <td>${escapeHtml(match.date)}</td>
-                <td>${escapeHtml(match.time)}</td>
-                <td>${escapeHtml(match.venue)}</td>
-                <td>${escapeHtml(match.stage)}</td>
-                <td>${escapeHtml(match.group)}</td>
+                <td>
+                  ${escapeHtml(match.no)}
+                </td>
+
+                <td>
+                  ${escapeHtml(match.date)}
+                </td>
+
+                <td>
+                  ${escapeHtml(match.time)}
+                </td>
+
+                <td>
+                  ${escapeHtml(match.venue)}
+                </td>
+
+                <td>
+                  ${escapeHtml(match.stage)}
+                </td>
+
+                <td>
+                  ${escapeHtml(match.group)}
+                </td>
+
                 <td>
                   ${team(match.team1)}
-                  <b class="v">${score(match)}</b>
+
+                  <b class="v">
+                    ${score(match)}
+                  </b>
+
                   ${team(match.team2)}
                 </td>
               </tr>
@@ -319,30 +785,41 @@ function renderTable() {
 
 async function initialize() {
   try {
-    const response = await fetch('data.json');
+    const [
+      bootstrap,
+      matchesResponse
+    ] = await Promise.all([
+      fetchJson('bootstrap.php'),
+      fetchJson('matches.php')
+    ]);
 
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
-    }
-
-    DATA = await response.json();
+    DATA = normalizeApiData(
+      bootstrap,
+      matchesResponse.matches
+    );
 
     applyTheme(DATA.theme);
     renderShell();
 
-    window.addEventListener('hashchange', go);
+    window.addEventListener(
+      'hashchange',
+      go
+    );
 
     go();
   } catch (error) {
-    console.error('Unable to load data.json:', error);
+    console.error(
+      'Unable to load tournament data:',
+      error
+    );
 
     $('#app').innerHTML = `
       <p class="loadError">
         Tournament data could not be loaded.
-        Serve the project with a local web server and check data.json.
       </p>
     `;
   }
 }
 
 initialize();
+```
