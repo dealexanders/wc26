@@ -98,9 +98,30 @@ async function telegramFetch(path, options = {}) {
 }
 
 async function loadVotingData() {
-  const matchesPromise = telegramFetch(
-    'matches.php'
-  );
+  const matchesPromise = fetch(
+    `${API_BASE}/matches.php`
+  ).then(async response => {
+    const rawBody = await response.text();
+
+    let body;
+
+    try {
+      body = rawBody ? JSON.parse(rawBody) : {};
+    } catch {
+      throw new Error(
+        `matches.php returned invalid JSON: ${rawBody.slice(0, 150)}`
+      );
+    }
+
+    if (!response.ok) {
+      throw new Error(
+        body?.error?.message ||
+        `matches.php failed with HTTP ${response.status}`
+      );
+    }
+
+    return body;
+  });
 
   const votesPromise = telegramFetch(
     'my-votes.php'
