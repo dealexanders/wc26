@@ -296,9 +296,12 @@ document.addEventListener(
 );
 
 loadVotingData().catch(error => {
+  console.error('Mini App loading failed:', error);
+
   document.querySelector('#matches').innerHTML = `
     <p class="error-message">
-      ${escapeHtml(error.message)}
+      Mini App loading failed:<br>
+      ${escapeHtml(error?.message || String(error))}
     </p>
   `;
 });
