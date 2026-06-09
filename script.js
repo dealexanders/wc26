@@ -39,8 +39,8 @@ const matchesByNumber = matches =>
 
 async function fetchJson(path, options = {}) {
   const response = await fetch(
-    `${API_BASE}/${path}`,
-    options
+  API_BASE + '/' + path,
+  options
   );
 
   let body;
@@ -49,7 +49,7 @@ async function fetchJson(path, options = {}) {
     body = await response.json();
   } catch (error) {
     throw new Error(
-      `Invalid JSON response from ${path}`
+      `Invalid JSON response from ' + path
     );
   }
 
