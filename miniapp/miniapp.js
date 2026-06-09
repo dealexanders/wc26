@@ -98,26 +98,31 @@ async function telegramFetch(path, options = {}) {
 }
 
 async function loadVotingData() {
+  const matchesPromise = telegramFetch(
+    'matches.php'
+  );
+
+  const votesPromise = telegramFetch(
+    'my-votes.php'
+  );
+
   const [
     matchesResponse,
     votesResponse,
   ] = await Promise.all([
-    fetch(
-      `${API_BASE}/matches.php`
-    ).then(response => response.json()),
-
-    telegramFetch('my-votes.php'),
+    matchesPromise,
+    votesPromise,
   ]);
 
   const votesByMatch = new Map(
-    votesResponse.votes.map(vote => [
+    (votesResponse.votes || []).map(vote => [
       Number(vote.match_id),
       vote.prediction,
     ])
   );
 
   renderVotingMatches(
-    matchesResponse.matches,
+    matchesResponse.matches || [],
     votesByMatch
   );
 }
