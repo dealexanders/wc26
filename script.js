@@ -2,7 +2,7 @@
 let DATA;
 
 const API_BASE =
-  'https://serwer2687458.hosting-home.pl/wc26-api/public/api/v1/';
+  'https://serwer2687458.hosting-home.pl/wc26-api/public/api/v1';
 
 const $ = (selector, root = document) =>
   root.querySelector(selector);
