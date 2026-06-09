@@ -98,42 +98,46 @@ async function telegramFetch(path, options = {}) {
 }
 
 async function loadVotingData() {
-  const matchesPromise = fetch(
-    `${API_BASE}/matches.php`
-  ).then(async response => {
-    const rawBody = await response.text();
+  let matchesResponse;
 
-    let body;
+  try {
+    const response = await fetch(
+      `${API_BASE}/matches.php`
+    );
+
+    const text = await response.text();
 
     try {
-      body = rawBody ? JSON.parse(rawBody) : {};
+      matchesResponse = JSON.parse(text);
     } catch {
       throw new Error(
-        `matches.php returned invalid JSON: ${rawBody.slice(0, 150)}`
+        `matches.php returned invalid JSON: ${text.slice(0, 120)}`
       );
     }
 
     if (!response.ok) {
       throw new Error(
-        body?.error?.message ||
-        `matches.php failed with HTTP ${response.status}`
+        matchesResponse?.error?.message ||
+        `matches.php HTTP ${response.status}`
       );
     }
+  } catch (error) {
+    throw new Error(
+      `MATCHES REQUEST FAILED: ${error.message}`
+    );
+  }
 
-    return body;
-  });
+  let votesResponse;
 
-  const votesPromise = telegramFetch(
-    'my-votes.php'
-  );
-
-  const [
-    matchesResponse,
-    votesResponse,
-  ] = await Promise.all([
-    matchesPromise,
-    votesPromise,
-  ]);
+  try {
+    votesResponse = await telegramFetch(
+      'my-votes.php'
+    );
+  } catch (error) {
+    throw new Error(
+      `MY-VOTES REQUEST FAILED: ${error.message}`
+    );
+  }
 
   const votesByMatch = new Map(
     (votesResponse.votes || []).map(vote => [
@@ -341,7 +345,7 @@ loadVotingData().catch(error => {
   document.querySelector('#matches').innerHTML = `
     <p class="error-message">
       Mini App loading failed:<br>
-      ${escapeHtml(error?.message || String(error))}
+      ${escapeHtml(error.message)}
     </p>
   `;
 });
