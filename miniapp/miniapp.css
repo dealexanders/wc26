@@ -1,0 +1,197 @@
+:root {
+  color-scheme: light dark;
+
+  --tg-bg: var(--tg-theme-bg-color, #050508);
+  --tg-text: var(--tg-theme-text-color, #f7f7fb);
+  --tg-hint: var(--tg-theme-hint-color, #a8adbd);
+  --tg-link: var(--tg-theme-link-color, #6ab7ff);
+  --tg-button: var(--tg-theme-button-color, #c6ff00);
+  --tg-button-text: var(--tg-theme-button-text-color, #111111);
+  --tg-secondary-bg:
+    var(--tg-theme-secondary-bg-color, #11131a);
+
+  --border: rgba(255, 255, 255, 0.12);
+  --radius: 18px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+  background: var(--tg-bg);
+}
+
+body {
+  min-height: 100%;
+  margin: 0;
+  padding:
+    max(16px, env(safe-area-inset-top))
+    16px
+    max(24px, env(safe-area-inset-bottom));
+
+  background: var(--tg-bg);
+  color: var(--tg-text);
+
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+header {
+  margin-bottom: 22px;
+}
+
+header h1 {
+  margin: 0;
+  font-size: clamp(28px, 9vw, 42px);
+  line-height: 1;
+  letter-spacing: -1.5px;
+}
+
+#userGreeting {
+  margin: 10px 0 0;
+  color: var(--tg-hint);
+  font-size: 15px;
+}
+
+#matches {
+  display: grid;
+  gap: 14px;
+}
+
+.vote-card {
+  padding: 18px;
+
+  background: var(--tg-secondary-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+}
+
+.vote-meta {
+  margin-bottom: 12px;
+
+  color: var(--tg-hint);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.vote-card h2 {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+
+  margin: 0 0 18px;
+
+  font-size: 18px;
+  line-height: 1.25;
+  text-align: center;
+}
+
+.vote-card h2 span {
+  color: var(--tg-hint);
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.vote-actions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.vote-button {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 14px;
+
+  border: 1px solid var(--border);
+  border-radius: 14px;
+
+  background: transparent;
+  color: var(--tg-text);
+
+  font-weight: 700;
+  cursor: pointer;
+
+  transition:
+    transform 120ms ease,
+    background-color 120ms ease,
+    border-color 120ms ease,
+    opacity 120ms ease;
+}
+
+.vote-button:active {
+  transform: scale(0.98);
+}
+
+.vote-button:hover {
+  border-color: var(--tg-button);
+}
+
+.vote-button.active {
+  background: var(--tg-button);
+  border-color: var(--tg-button);
+  color: var(--tg-button-text);
+}
+
+.vote-button:disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
+.vote-message {
+  min-height: 20px;
+  margin: 12px 0 0;
+
+  color: var(--tg-hint);
+  font-size: 13px;
+  text-align: center;
+}
+
+.empty-state,
+.error-message {
+  padding: 24px 18px;
+
+  background: var(--tg-secondary-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+
+  color: var(--tg-hint);
+  line-height: 1.5;
+  text-align: center;
+}
+
+@media (min-width: 520px) {
+  body {
+    width: min(100%, 720px);
+    margin: 0 auto;
+  }
+
+  .vote-actions {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vote-button {
+    transition: none;
+  }
+}
