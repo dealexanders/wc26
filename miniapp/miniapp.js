@@ -43,13 +43,8 @@ const escapeHtml = (value = '') =>
     })[character]
   );
 
-async function telegramFetch(
-  path,
-  options = {}
-) {
-  const headers = new Headers(
-    options.headers || {}
-  );
+async function telegramFetch(path, options = {}) {
+  const headers = new Headers(options.headers || {});
 
   headers.set(
     'X-Telegram-Init-Data',
@@ -63,20 +58,39 @@ async function telegramFetch(
     );
   }
 
-  const response = await fetch(
-    `${API_BASE}/${path}`,
-    {
+  const url = `${API_BASE}/${path}`;
+
+  let response;
+
+  try {
+    response = await fetch(url, {
       ...options,
       headers,
-    }
-  );
+    });
+  } catch (error) {
+    throw new Error(
+      `Network request failed for ${path}: ${error.message}`
+    );
+  }
 
-  const body = await response.json();
+  const rawBody = await response.text();
+
+  let body;
+
+  try {
+    body = rawBody
+      ? JSON.parse(rawBody)
+      : {};
+  } catch {
+    throw new Error(
+      `${path} returned invalid JSON: ${rawBody.slice(0, 150)}`
+    );
+  }
 
   if (!response.ok) {
     throw new Error(
-      body?.error?.message
-      || `HTTP ${response.status}`
+      body?.error?.message ||
+      `${path} failed with HTTP ${response.status}`
     );
   }
 
