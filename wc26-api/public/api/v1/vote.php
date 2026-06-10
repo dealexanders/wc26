@@ -20,13 +20,15 @@ $matchId = filter_var(
     FILTER_VALIDATE_INT
 );
 
-$prediction = $body['prediction'] ?? null;
+$homeScore = filter_var(
+    $body['home_score'] ?? null,
+    FILTER_VALIDATE_INT
+);
 
-$allowedPredictions = [
-    'HOME_WIN',
-    'DRAW',
-    'AWAY_WIN',
-];
+$awayScore = filter_var(
+    $body['away_score'] ?? null,
+    FILTER_VALIDATE_INT
+);
 
 if ($matchId === false || $matchId <= 0) {
     sendJson([
@@ -38,21 +40,22 @@ if ($matchId === false || $matchId <= 0) {
 }
 
 if (
-    !is_string($prediction)
-    || !in_array(
-        $prediction,
-        $allowedPredictions,
-        true
-    )
+    !isValidForecastScore($homeScore)
+    || !isValidForecastScore($awayScore)
 ) {
     sendJson([
         'error' => [
-            'code' => 'INVALID_PREDICTION',
+            'code' => 'INVALID_FORECAST_SCORE',
             'message' =>
-                'Prediction must be HOME_WIN, DRAW, or AWAY_WIN.',
+                'Both forecast scores must be integers from 0 to 20.',
         ],
     ], 422);
 }
+
+$prediction = calculatePredictionOutcome(
+    $homeScore,
+    $awayScore
+);
 
 try {
     $telegramUser = validateTelegramInitData(
@@ -195,22 +198,37 @@ try {
         INSERT INTO votes (
             user_id,
             match_id,
+            predicted_home_score,
+            predicted_away_score,
             prediction
         )
         VALUES (
             :user_id,
             :match_id,
+            :predicted_home_score,
+            :predicted_away_score,
             :prediction
         )
         ON DUPLICATE KEY UPDATE
-            prediction = VALUES(prediction),
-            updated_at = CURRENT_TIMESTAMP
+            predicted_home_score =
+                VALUES(predicted_home_score),
+
+            predicted_away_score =
+                VALUES(predicted_away_score),
+
+            prediction =
+                VALUES(prediction),
+
+            updated_at =
+                CURRENT_TIMESTAMP
         '
     );
 
     $voteStatement->execute([
         'user_id' => $userId,
         'match_id' => $matchId,
+        'predicted_home_score' => $homeScore,
+        'predicted_away_score' => $awayScore,
         'prediction' => $prediction,
     ]);
 
@@ -218,9 +236,11 @@ try {
 
     sendJson([
         'success' => true,
-        'vote' => [
+        'forecast' => [
             'match_id' => $matchId,
-            'prediction' => $prediction,
+            'home_score' => $homeScore,
+            'away_score' => $awayScore,
+            'outcome' => $prediction,
         ],
     ]);
 } catch (Throwable $exception) {
