@@ -7,6 +7,9 @@ const API_BASE =
   'https://serwer2687458.hosting-home.pl/wc26-api/public/api/v1';
 
 const initData = tg.initData;
+const saveTimers = new Map();
+
+let currentMatches = [];
 
 if (!initData) {
   document.body.innerHTML = `
@@ -139,22 +142,72 @@ async function loadVotingData() {
     );
   }
 
-  const votesByMatch = new Map(
-    (votesResponse.votes || []).map(vote => [
-      Number(vote.match_id),
-      vote.prediction,
-    ])
+  currentMatches =
+    matchesResponse.matches || [];
+
+  const forecastsByMatch = new Map(
+    (votesResponse.votes || []).map(
+      forecast => [
+        Number(forecast.match_id),
+        {
+          homeScore: Number(
+            forecast.predicted_home_score
+          ),
+          awayScore: Number(
+            forecast.predicted_away_score
+          ),
+          outcome: forecast.outcome,
+        }
+      ]
+    )
   );
 
-  renderVotingMatches(
-    matchesResponse.matches || [],
-    votesByMatch
+  renderForecastMatches(
+    currentMatches,
+    forecastsByMatch
   );
 }
 
-function renderVotingMatches(
+function scoreSelector(
+  matchId,
+  side,
+  value
+) {
+  return `
+    <div
+      class="score-selector"
+      data-match-id="${matchId}"
+      data-side="${side}"
+    >
+      <button
+        type="button"
+        class="score-step score-up"
+        aria-label="Increase score"
+      >
+        ▲
+      </button>
+
+      <output
+        class="score-value"
+        aria-live="polite"
+      >
+        ${value}
+      </output>
+
+      <button
+        type="button"
+        class="score-step score-down"
+        aria-label="Decrease score"
+      >
+        ▼
+      </button>
+    </div>
+  `;
+}
+
+function renderForecastMatches(
   matches,
-  votesByMatch
+  forecastsByMatch
 ) {
   const container =
     document.querySelector('#matches');
@@ -177,165 +230,303 @@ function renderVotingMatches(
 
   container.innerHTML = upcoming
     .map(match => {
-      const selected =
-        votesByMatch.get(
-          Number(match.id)
+      const existing =
+        forecastsByMatch.get(Number(match.id));
+
+      const homeScore =
+        existing?.homeScore ?? 0;
+
+      const awayScore =
+        existing?.awayScore ?? 0;
+
+      const outcome =
+        calculateDisplayedOutcome(
+          homeScore,
+          awayScore
         );
-
-      const homeName =
-        match.home_team_name;
-
-      const awayName =
-        match.away_team_name;
 
       return `
         <article
           class="vote-card"
           data-match-id="${match.id}"
+          data-has-saved-forecast="${
+            existing ? 'true' : 'false'
+          }"
         >
           <div class="vote-meta">
             Match ${match.match_number}
           </div>
 
-          <h2>
-            ${escapeHtml(homeName)}
-            <span>vs</span>
-            ${escapeHtml(awayName)}
-          </h2>
+          <div class="score-matchup">
+            <div class="score-team">
+              <h2>
+                ${escapeHtml(
+                  match.home_team_name
+                )}
+              </h2>
 
-          <div class="vote-actions">
-            ${voteButton(
-              match.id,
-              'HOME_WIN',
-              `${homeName} wins`,
-              selected
-            )}
+              ${scoreSelector(
+                match.id,
+                'home',
+                homeScore
+              )}
+            </div>
 
-            ${voteButton(
-              match.id,
-              'DRAW',
-              'Draw',
-              selected
-            )}
+            <div class="versus-label">
+              VS
+            </div>
 
-            ${voteButton(
-              match.id,
-              'AWAY_WIN',
-              `${awayName} wins`,
-              selected
-            )}
+            <div class="score-team">
+              <h2>
+                ${escapeHtml(
+                  match.away_team_name
+                )}
+              </h2>
+
+              ${scoreSelector(
+                match.id,
+                'away',
+                awayScore
+              )}
+            </div>
           </div>
+
+          <p class="forecast-outcome">
+            ${escapeHtml(
+              formatOutcome(
+                outcome,
+                match.home_team_name,
+                match.away_team_name
+              )
+            )}
+          </p>
 
           <p
             class="vote-message"
             aria-live="polite"
-          ></p>
+          >
+            ${
+              existing
+                ? 'Forecast saved'
+                : 'Adjust a score to submit'
+            }
+          </p>
         </article>
       `;
     })
     .join('');
 }
 
-function voteButton(
-  matchId,
-  prediction,
-  label,
-  selected
+function calculateDisplayedOutcome(
+  homeScore,
+  awayScore
 ) {
-  const active =
-    selected === prediction
-      ? ' active'
-      : '';
+  if (homeScore > awayScore) {
+    return 'HOME_WIN';
+  }
 
-  return `
-    <button
-      type="button"
-      class="vote-button${active}"
-      data-match-id="${matchId}"
-      data-prediction="${prediction}"
-    >
-      ${escapeHtml(label)}
-    </button>
-  `;
+  if (homeScore < awayScore) {
+    return 'AWAY_WIN';
+  }
+
+  return 'DRAW';
+}
+
+function formatOutcome(
+  outcome,
+  homeName,
+  awayName
+) {
+  if (outcome === 'HOME_WIN') {
+    return `${homeName} win`;
+  }
+
+  if (outcome === 'AWAY_WIN') {
+    return `${awayName} win`;
+  }
+
+  return 'Draw';
+}
+
+function getCardScores(card) {
+  const homeScore = Number(
+    card.querySelector(
+      '[data-side="home"] .score-value'
+    ).textContent
+  );
+
+  const awayScore = Number(
+    card.querySelector(
+      '[data-side="away"] .score-value'
+    ).textContent
+  );
+
+  return {
+    homeScore,
+    awayScore,
+  };
+}
+
+function updateCardOutcome(card) {
+  const {
+    homeScore,
+    awayScore,
+  } = getCardScores(card);
+
+  const outcome =
+    calculateDisplayedOutcome(
+      homeScore,
+      awayScore
+    );
+
+  const matchId = Number(
+    card.dataset.matchId
+  );
+
+  const match = currentMatches.find(
+    item => Number(item.id) === matchId
+  );
+
+  card.querySelector(
+    '.forecast-outcome'
+  ).textContent = formatOutcome(
+    outcome,
+    match.home_team_name,
+    match.away_team_name
+  );
+}
+
+function scheduleForecastSave(card) {
+  const matchId = Number(
+    card.dataset.matchId
+  );
+
+  const previousTimer =
+    saveTimers.get(matchId);
+
+  if (previousTimer) {
+    clearTimeout(previousTimer);
+  }
+
+  const message = card.querySelector(
+    '.vote-message'
+  );
+
+  message.textContent =
+    'Forecast changed…';
+
+  const timer = setTimeout(
+    () => saveForecast(card),
+    700
+  );
+
+  saveTimers.set(matchId, timer);
+}
+
+async function saveForecast(card) {
+  const matchId = Number(
+    card.dataset.matchId
+  );
+
+  const {
+    homeScore,
+    awayScore,
+  } = getCardScores(card);
+
+  const message = card.querySelector(
+    '.vote-message'
+  );
+
+  card
+    .querySelectorAll('.score-step')
+    .forEach(button => {
+      button.disabled = true;
+    });
+
+  message.textContent =
+    'Saving forecast…';
+
+  try {
+    const response = await telegramFetch(
+      'vote.php',
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          match_id: matchId,
+          home_score: homeScore,
+          away_score: awayScore,
+        }),
+      }
+    );
+
+    card.dataset.hasSavedForecast = 'true';
+
+    message.textContent =
+      `Saved: ${homeScore}–${awayScore}`;
+
+    tg.HapticFeedback
+      ?.notificationOccurred('success');
+
+    console.log(
+      'Forecast saved:',
+      response.forecast
+    );
+  } catch (error) {
+    message.textContent =
+      error.message;
+
+    tg.HapticFeedback
+      ?.notificationOccurred('error');
+  } finally {
+    card
+      .querySelectorAll('.score-step')
+      .forEach(button => {
+        button.disabled = false;
+      });
+
+    saveTimers.delete(matchId);
+  }
 }
 
 document.addEventListener(
   'click',
-  async event => {
-    const button = event.target.closest(
-      '.vote-button'
+  event => {
+    const stepButton = event.target.closest(
+      '.score-step'
     );
 
-    if (!button) return;
+    if (!stepButton) {
+      return;
+    }
 
-    const card = button.closest(
+    const selector = stepButton.closest(
+      '.score-selector'
+    );
+
+    const card = selector.closest(
       '.vote-card'
     );
 
-    const message = card.querySelector(
-      '.vote-message'
+    const output = selector.querySelector(
+      '.score-value'
     );
 
-    const matchId = Number(
-      button.dataset.matchId
-    );
+    let value = Number(output.textContent);
 
-    const prediction =
-      button.dataset.prediction;
-
-    card
-      .querySelectorAll('.vote-button')
-      .forEach(item => {
-        item.disabled = true;
-      });
-
-    message.textContent =
-      'Saving prediction…';
-
-    try {
-      await telegramFetch(
-        'vote.php',
-        {
-          method: 'POST',
-          body: JSON.stringify({
-            match_id: matchId,
-            prediction,
-          }),
-        }
-      );
-
-      card
-        .querySelectorAll('.vote-button')
-        .forEach(item => {
-          item.classList.toggle(
-            'active',
-            item.dataset.prediction
-              === prediction
-          );
-        });
-
-      message.textContent =
-        'Prediction saved';
-
-      tg.HapticFeedback
-        ?.notificationOccurred(
-          'success'
-        );
-    } catch (error) {
-      message.textContent =
-        error.message;
-
-      tg.HapticFeedback
-        ?.notificationOccurred(
-          'error'
-        );
-    } finally {
-      card
-        .querySelectorAll('.vote-button')
-        .forEach(item => {
-          item.disabled = false;
-        });
+    if (
+      stepButton.classList.contains(
+        'score-up'
+      )
+    ) {
+      value = Math.min(value + 1, 20);
+    } else {
+      value = Math.max(value - 1, 0);
     }
+
+    output.textContent = String(value);
+
+    updateCardOutcome(card);
+    scheduleForecastSave(card);
   }
 );
 
