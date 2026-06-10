@@ -7,7 +7,10 @@ const API_BASE =
   'https://serwer2687458.hosting-home.pl/wc26-api/public/api/v1';
 
 const initData = tg.initData;
-const saveTimers = new Map();
+
+const SCORE_MIN = 0;
+const SCORE_MAX = 20;
+const SCORE_ITEM_HEIGHT = 44;
 
 let currentMatches = [];
 
@@ -168,39 +171,41 @@ async function loadVotingData() {
   );
 }
 
-function scoreSelector(
-  matchId,
-  side,
-  value
-) {
+function scoreWheel(matchId, side, value) {
+  const numbers = Array.from(
+    { length: SCORE_MAX - SCORE_MIN + 1 },
+    (_, index) => SCORE_MIN + index
+  );
+
   return `
     <div
-      class="score-selector"
+      class="score-wheel"
       data-match-id="${matchId}"
       data-side="${side}"
+      data-value="${value}"
     >
-      <button
-        type="button"
-        class="score-step score-up"
-        aria-label="Increase score"
+      <div
+        class="score-wheel-window"
+        tabindex="0"
+        role="spinbutton"
+        aria-valuemin="${SCORE_MIN}"
+        aria-valuemax="${SCORE_MAX}"
+        aria-valuenow="${value}"
+        aria-label="${side === 'home' ? 'First team score' : 'Second team score'}"
       >
-        ▲
-      </button>
-
-      <output
-        class="score-value"
-        aria-live="polite"
-      >
-        ${value}
-      </output>
-
-      <button
-        type="button"
-        class="score-step score-down"
-        aria-label="Decrease score"
-      >
-        ▼
-      </button>
+        <div class="score-wheel-list">
+          ${numbers.map(number => `
+            <button
+              type="button"
+              class="score-wheel-item ${number === value ? 'active' : ''}"
+              data-score="${number}"
+              tabindex="-1"
+            >
+              ${number}
+            </button>
+          `).join('')}
+        </div>
+      </div>
     </div>
   `;
 }
@@ -249,23 +254,20 @@ function renderForecastMatches(
         <article
           class="vote-card"
           data-match-id="${match.id}"
-          data-has-saved-forecast="${
-            existing ? 'true' : 'false'
-          }"
+          data-dirty="false"
+          data-has-saved-forecast="${existing ? 'true' : 'false'}"
         >
           <div class="vote-meta">
-            Match ${match.match_number}
+            Match ${escapeHtml(match.match_number)}
           </div>
 
           <div class="score-matchup">
             <div class="score-team">
               <h2>
-                ${escapeHtml(
-                  match.home_team_name
-                )}
+                ${escapeHtml(match.home_team_name)}
               </h2>
 
-              ${scoreSelector(
+              ${scoreWheel(
                 match.id,
                 'home',
                 homeScore
@@ -278,12 +280,10 @@ function renderForecastMatches(
 
             <div class="score-team">
               <h2>
-                ${escapeHtml(
-                  match.away_team_name
-                )}
+                ${escapeHtml(match.away_team_name)}
               </h2>
 
-              ${scoreSelector(
+              ${scoreWheel(
                 match.id,
                 'away',
                 awayScore
@@ -301,20 +301,31 @@ function renderForecastMatches(
             )}
           </p>
 
+          <button
+            type="button"
+            class="forecast-save-button"
+            data-match-id="${match.id}"
+            aria-label="Save forecast"
+          >
+            ✓
+          </button>
+
           <p
             class="vote-message"
             aria-live="polite"
           >
             ${
               existing
-                ? 'Forecast saved'
-                : 'Adjust a score to submit'
+                ? `Saved: ${homeScore}–${awayScore}`
+                : 'Select score and tap ✓ to save'
             }
           </p>
         </article>
       `;
     })
     .join('');
+
+  initializeScoreWheels(container);
 }
 
 function calculateDisplayedOutcome(
@@ -351,14 +362,14 @@ function formatOutcome(
 function getCardScores(card) {
   const homeScore = Number(
     card.querySelector(
-      '[data-side="home"] .score-value'
-    ).textContent
+      '.score-wheel[data-side="home"]'
+    ).dataset.value
   );
 
   const awayScore = Number(
     card.querySelector(
-      '[data-side="away"] .score-value'
-    ).textContent
+      '.score-wheel[data-side="away"]'
+    ).dataset.value
   );
 
   return {
@@ -373,19 +384,19 @@ function updateCardOutcome(card) {
     awayScore,
   } = getCardScores(card);
 
+  const matchId =
+    Number(card.dataset.matchId);
+
+  const match =
+    currentMatches.find(item =>
+      Number(item.id) === matchId
+    );
+
   const outcome =
     calculateDisplayedOutcome(
       homeScore,
       awayScore
     );
-
-  const matchId = Number(
-    card.dataset.matchId
-  );
-
-  const match = currentMatches.find(
-    item => Number(item.id) === matchId
-  );
 
   card.querySelector(
     '.forecast-outcome'
@@ -396,137 +407,277 @@ function updateCardOutcome(card) {
   );
 }
 
-function scheduleForecastSave(card) {
-  const matchId = Number(
-    card.dataset.matchId
-  );
+function initializeScoreWheels(root = document) {
+  root
+    .querySelectorAll('.score-wheel')
+    .forEach(wheel => {
+      const value =
+        Number(wheel.dataset.value);
 
-  const previousTimer =
-    saveTimers.get(matchId);
+      const windowElement =
+        wheel.querySelector('.score-wheel-window');
 
-  if (previousTimer) {
-    clearTimeout(previousTimer);
-  }
+      windowElement.scrollTop =
+        value * SCORE_ITEM_HEIGHT;
 
-  const message = card.querySelector(
-    '.vote-message'
-  );
-
-  message.textContent =
-    'Forecast changed…';
-
-  const timer = setTimeout(
-    () => saveForecast(card),
-    700
-  );
-
-  saveTimers.set(matchId, timer);
+      updateWheelSelection(wheel);
+    });
 }
 
-async function saveForecast(card) {
-  const matchId = Number(
-    card.dataset.matchId
+function updateWheelSelection(wheel) {
+  const windowElement =
+    wheel.querySelector('.score-wheel-window');
+
+  const items =
+    [...wheel.querySelectorAll('.score-wheel-item')];
+
+  const selectedScore =
+    Math.round(
+      windowElement.scrollTop / SCORE_ITEM_HEIGHT
+    );
+
+  const safeScore =
+    Math.min(
+      SCORE_MAX,
+      Math.max(SCORE_MIN, selectedScore)
+    );
+
+  wheel.dataset.value =
+    String(safeScore);
+
+  windowElement.setAttribute(
+    'aria-valuenow',
+    String(safeScore)
   );
 
-  const {
-    homeScore,
-    awayScore,
-  } = getCardScores(card);
+  items.forEach(item => {
+    item.classList.toggle(
+      'active',
+      Number(item.dataset.score) === safeScore
+    );
+  });
 
-  const message = card.querySelector(
-    '.vote-message'
-  );
+  const expectedScrollTop =
+    safeScore * SCORE_ITEM_HEIGHT;
 
-  card
-    .querySelectorAll('.score-step')
-    .forEach(button => {
-      button.disabled = true;
+  if (
+    Math.abs(
+      windowElement.scrollTop - expectedScrollTop
+    ) > 1
+  ) {
+    windowElement.scrollTo({
+      top: expectedScrollTop,
+      behavior: 'smooth',
     });
-
-  message.textContent =
-    'Saving forecast…';
-
-  try {
-    const response = await telegramFetch(
-      'vote.php',
-      {
-        method: 'POST',
-        body: JSON.stringify({
-          match_id: matchId,
-          home_score: homeScore,
-          away_score: awayScore,
-        }),
-      }
-    );
-
-    card.dataset.hasSavedForecast = 'true';
-
-    message.textContent =
-      `Saved: ${homeScore}–${awayScore}`;
-
-    tg.HapticFeedback
-      ?.notificationOccurred('success');
-
-    console.log(
-      'Forecast saved:',
-      response.forecast
-    );
-  } catch (error) {
-    message.textContent =
-      error.message;
-
-    tg.HapticFeedback
-      ?.notificationOccurred('error');
-  } finally {
-    card
-      .querySelectorAll('.score-step')
-      .forEach(button => {
-        button.disabled = false;
-      });
-
-    saveTimers.delete(matchId);
   }
 }
 
 document.addEventListener(
-  'click',
+  'scroll',
   event => {
-    const stepButton = event.target.closest(
-      '.score-step'
-    );
+    const windowElement =
+      event.target.closest?.('.score-wheel-window');
 
-    if (!stepButton) {
+    if (!windowElement) {
       return;
     }
 
-    const selector = stepButton.closest(
-      '.score-selector'
+    const wheel =
+      windowElement.closest('.score-wheel');
+
+    clearTimeout(
+      windowElement.dataset.scrollTimerId
     );
 
-    const card = selector.closest(
-      '.vote-card'
-    );
+    const timerId = setTimeout(() => {
+      updateWheelSelection(wheel);
 
-    const output = selector.querySelector(
-      '.score-value'
-    );
+      const card =
+        wheel.closest('.vote-card');
 
-    let value = Number(output.textContent);
+      card.dataset.dirty = 'true';
 
-    if (
-      stepButton.classList.contains(
-        'score-up'
-      )
-    ) {
-      value = Math.min(value + 1, 20);
-    } else {
-      value = Math.max(value - 1, 0);
+      updateCardOutcome(card);
+
+      card.querySelector('.vote-message').textContent =
+        'Forecast changed. Tap ✓ to save.';
+    }, 120);
+
+    windowElement.dataset.scrollTimerId =
+      String(timerId);
+  },
+  true
+);
+
+document.addEventListener(
+  'click',
+  event => {
+    const item =
+      event.target.closest('.score-wheel-item');
+
+    if (!item) {
+      return;
     }
 
-    output.textContent = String(value);
+    const wheel =
+      item.closest('.score-wheel');
+
+    const windowElement =
+      wheel.querySelector('.score-wheel-window');
+
+    const score =
+      Number(item.dataset.score);
+
+    windowElement.scrollTo({
+      top: score * SCORE_ITEM_HEIGHT,
+      behavior: 'smooth',
+    });
+
+    wheel.dataset.value =
+      String(score);
+
+    updateWheelSelection(wheel);
+
+    const card =
+      wheel.closest('.vote-card');
+
+    card.dataset.dirty = 'true';
 
     updateCardOutcome(card);
-    scheduleForecastSave(card);
+
+    card.querySelector('.vote-message').textContent =
+      'Forecast changed. Tap ✓ to save.';
+  }
+);
+
+document.addEventListener(
+  'keydown',
+  event => {
+    const windowElement =
+      event.target.closest('.score-wheel-window');
+
+    if (!windowElement) {
+      return;
+    }
+
+    if (
+      event.key !== 'ArrowUp'
+      && event.key !== 'ArrowDown'
+    ) {
+      return;
+    }
+
+    event.preventDefault();
+
+    const wheel =
+      windowElement.closest('.score-wheel');
+
+    const currentValue =
+      Number(wheel.dataset.value);
+
+    const nextValue =
+      event.key === 'ArrowUp'
+        ? Math.max(SCORE_MIN, currentValue - 1)
+        : Math.min(SCORE_MAX, currentValue + 1);
+
+    windowElement.scrollTo({
+      top: nextValue * SCORE_ITEM_HEIGHT,
+      behavior: 'smooth',
+    });
+
+    wheel.dataset.value =
+      String(nextValue);
+
+    updateWheelSelection(wheel);
+
+    const card =
+      wheel.closest('.vote-card');
+
+    card.dataset.dirty = 'true';
+
+    updateCardOutcome(card);
+
+    card.querySelector('.vote-message').textContent =
+      'Forecast changed. Tap ✓ to save.';
+  }
+);
+
+document.addEventListener(
+  'click',
+  async event => {
+    const saveButton =
+      event.target.closest('.forecast-save-button');
+
+    if (!saveButton) {
+      return;
+    }
+
+    const card =
+      saveButton.closest('.vote-card');
+
+    const matchId =
+      Number(card.dataset.matchId);
+
+    const {
+      homeScore,
+      awayScore,
+    } = getCardScores(card);
+
+    const message =
+      card.querySelector('.vote-message');
+
+    saveButton.disabled = true;
+
+    card
+      .querySelectorAll('.score-wheel-window')
+      .forEach(item => {
+        item.setAttribute('aria-disabled', 'true');
+      });
+
+    message.textContent =
+      'Saving forecast…';
+
+    try {
+      const response = await telegramFetch(
+        'vote.php',
+        {
+          method: 'POST',
+          body: JSON.stringify({
+            match_id: matchId,
+            home_score: homeScore,
+            away_score: awayScore,
+          }),
+        }
+      );
+
+      card.dataset.dirty = 'false';
+      card.dataset.hasSavedForecast = 'true';
+
+      message.textContent =
+        `Saved: ${homeScore}–${awayScore}`;
+
+      tg.HapticFeedback
+        ?.notificationOccurred('success');
+
+      console.log(
+        'Forecast saved:',
+        response.forecast
+      );
+    } catch (error) {
+      message.textContent =
+        error.message;
+
+      tg.HapticFeedback
+        ?.notificationOccurred('error');
+    } finally {
+      saveButton.disabled = false;
+
+      card
+        .querySelectorAll('.score-wheel-window')
+        .forEach(item => {
+          item.removeAttribute('aria-disabled');
+        });
+    }
   }
 );
 
