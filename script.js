@@ -630,7 +630,13 @@ function matchCard(match) {
     'Group';
 
   return `
-    <article class="matchCard">
+    <article
+      class="matchCard"
+      data-match-id="${match.id}"
+      tabindex="0"
+      role="button"
+      aria-label="Open forecast details for match ${escapeHtml(match.no)}"
+    >
       <div class="matchMeta">
         <span>
           #${escapeHtml(
@@ -653,6 +659,34 @@ function matchCard(match) {
               `
               : ''
           }
+        </span>
+      </div>
+
+      <div class="forecastPreview">
+        <span
+          title="${escapeHtml(
+            `${DATA.teams[match.team1]?.name || match.team1} win`
+          )}"
+        >
+          ← ${escapeHtml(
+            match.voteResults.homeWin
+          )}
+        </span>
+
+        <span title="Draw">
+          ↕ ${escapeHtml(
+            match.voteResults.draw
+          )}
+        </span>
+
+        <span
+          title="${escapeHtml(
+            `${DATA.teams[match.team2]?.name || match.team2} win`
+          )}"
+        >
+          ${escapeHtml(
+            match.voteResults.awayWin
+          )} →
         </span>
       </div>
 
@@ -780,6 +814,182 @@ function renderTable() {
     </div>
   `;
 }
+
+async function openForecastDetails(
+  matchId
+) {
+  const dialog =
+    $('#forecastDialog');
+
+  const body =
+    $('#forecastDialogBody');
+
+  const match = DATA.matches.find(
+    item => item.id === matchId
+  );
+
+  if (!match) {
+    return;
+  }
+
+  $('#forecastDialogTitle').textContent =
+    `Match ${match.no}: ${
+      DATA.teams[match.team1]?.name
+      || match.team1
+    } vs ${
+      DATA.teams[match.team2]?.name
+      || match.team2
+    }`;
+
+  body.innerHTML = `
+    <p>Loading forecasts…</p>
+  `;
+
+  dialog.showModal();
+
+  try {
+    const response = await fetchJson(
+      `forecast-details.php?match_id=${encodeURIComponent(
+        matchId
+      )}`
+    );
+
+    renderForecastDetails(
+      body,
+      response.forecasts || [],
+      match
+    );
+  } catch (error) {
+    body.innerHTML = `
+      <p class="loadError">
+        ${escapeHtml(error.message)}
+      </p>
+    `;
+  }
+}
+
+function renderForecastDetails(
+  container,
+  forecasts,
+  match
+) {
+  if (!forecasts.length) {
+    container.innerHTML = `
+      <p>No forecasts yet.</p>
+    `;
+
+    return;
+  }
+
+  const homeName =
+    DATA.teams[match.team1]?.name
+    || match.team1;
+
+  const awayName =
+    DATA.teams[match.team2]?.name
+    || match.team2;
+
+  container.innerHTML = `
+    <div class="forecastDetailList">
+      ${forecasts.map(forecast => `
+        <article class="forecastDetailRow">
+          <strong>
+            ${escapeHtml(
+              forecast.voter_name
+            )}
+          </strong>
+
+          <span class="forecastDetailScore">
+            ${escapeHtml(
+              forecast.home_score
+            )}
+            –
+            ${escapeHtml(
+              forecast.away_score
+            )}
+          </span>
+
+          <span>
+            ${escapeHtml(
+              formatPublicOutcome(
+                forecast.outcome,
+                homeName,
+                awayName
+              )
+            )}
+          </span>
+        </article>
+      `).join('')}
+    </div>
+  `;
+}
+
+function formatPublicOutcome(
+  outcome,
+  homeName,
+  awayName
+) {
+  if (outcome === 'HOME_WIN') {
+    return `${homeName} win`;
+  }
+
+  if (outcome === 'AWAY_WIN') {
+    return `${awayName} win`;
+  }
+
+  return 'Draw';
+}
+
+document.addEventListener(
+  'click',
+  event => {
+    const card = event.target.closest(
+      '.matchCard[data-match-id]'
+    );
+
+    if (!card) {
+      return;
+    }
+
+    openForecastDetails(
+      Number(card.dataset.matchId)
+    );
+  }
+);
+
+document.addEventListener(
+  'keydown',
+  event => {
+    if (
+      event.key !== 'Enter'
+      && event.key !== ' '
+    ) {
+      return;
+    }
+
+    const card = event.target.closest(
+      '.matchCard[data-match-id]'
+    );
+
+    if (!card) {
+      return;
+    }
+
+    event.preventDefault();
+
+    openForecastDetails(
+      Number(card.dataset.matchId)
+    );
+  }
+);
+
+$('#closeForecastDialog')
+  .addEventListener(
+    'click',
+    () => {
+      $('#forecastDialog').close();
+    }
+  );
 
 async function initialize() {
   try {
