@@ -38,7 +38,14 @@ $sql = '
         SUM(vt.prediction = "HOME_WIN") AS home_win_votes,
         SUM(vt.prediction = "DRAW") AS draw_votes,
         SUM(vt.prediction = "AWAY_WIN") AS away_win_votes,
-        COUNT(vt.id) AS total_votes
+        COUNT(vt.id) AS total_votes,
+        COUNT(
+            CASE
+                WHEN vt.predicted_home_score IS NOT NULL
+                 AND vt.predicted_away_score IS NOT NULL
+                THEN 1
+            END
+        ) AS score_forecast_count
 
     FROM matches m
 

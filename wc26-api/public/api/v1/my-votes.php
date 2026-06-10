@@ -37,7 +37,9 @@ $statement = $pdo->prepare(
     '
     SELECT
         match_id,
-        prediction,
+        predicted_home_score,
+        predicted_away_score,
+        prediction AS outcome,
         created_at,
         updated_at
     FROM votes
