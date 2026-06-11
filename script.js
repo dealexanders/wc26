@@ -199,8 +199,20 @@ function normalizeApiData(
           match.venue_city ||
           'TBC',
 
-        status:
-          match.status || 'SCHEDULED',
+        result: (
+          match.home_score !== null &&
+          match.away_score !== null
+        )
+          ? {
+              home: Number(match.home_score),
+              away: Number(match.away_score)
+            }
+          : null,
+
+        status: match.status,
+
+        isPast:
+          Number(match.is_past) === 1,
 
         score1:
           match.home_score === null ||
@@ -666,9 +678,27 @@ function matchCard(match) {
     DATA.content.groups?.groupLabel ||
     'Group';
 
+  const resultHtml = match.result
+    ? `
+      <div class="matchResult">
+        FT ${escapeHtml(match.result.home)}
+        –
+        ${escapeHtml(match.result.away)}
+      </div>
+    `
+    : '';
+
+  const cardClasses = [
+    'matchCard',
+    match.isPast ? 'matchCardPast' : '',
+    match.status === 'FINISHED'
+      ? 'matchCardFinished'
+      : ''
+  ].filter(Boolean).join(' ');
+
   return `
     <article
-      class="matchCard"
+      class="${cardClasses}"
       data-match-id="${match.id}"
       tabindex="0"
       role="button"
@@ -736,6 +766,8 @@ function matchCard(match) {
 
         ${team(match.team2)}
       </div>
+
+      ${resultHtml}
 
       <div class="where">
         <span>
