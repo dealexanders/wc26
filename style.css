@@ -88,3 +88,59 @@
   font-size: 20px;
   font-weight: 800;
 }
+
+.forecastTicker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 0 0 34px;
+  padding: 14px 18px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: linear-gradient(90deg, rgba(198, 255, 0, 0.08), rgba(255, 255, 255, 0.05), rgba(198, 255, 0, 0.08));
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+  font-weight: 850;
+  text-align: center;
+}
+
+.forecastTicker::before,
+.forecastTicker::after {
+  content: "✦";
+  flex: 0 0 auto;
+  color: #c6ff00;
+}
+
+.forecastTickerButton {
+  flex: 0 0 auto;
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: #c6ff00;
+  color: #111;
+  font-weight: 950;
+  text-decoration: none;
+  transition: box-shadow 160ms ease, transform 160ms ease;
+}
+
+.forecastTickerButton:hover {
+  box-shadow: 0 0 24px rgba(198, 255, 0, 0.42);
+  transform: translateY(-1px);
+}
+
+.forecastTickerButton:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 3px;
+}
+
+@media (max-width: 760px) {
+  .forecastTicker {
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 28px;
+  }
+
+  .forecastTickerButton {
+    width: 100%;
+  }
+}

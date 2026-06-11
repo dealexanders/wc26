@@ -31,6 +31,11 @@
       "trophyLabel": "trophy",
       "trophyIcon": "🏆",
       "trophyBase": "26",
+      "forecastTickerLabel": "WC26 forecast game",
+      "forecastTickerIntro": "Predict every match. Pick the score.",
+      "forecastTickerButton": "Join the WC26 forecast",
+      "forecastTickerOutro": "game in Telegram",
+      "forecastTickerUrl": "https://t.me/mebugo_bot",
       "stats": [
         "12 groups",
         "48 teams",

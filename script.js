@@ -466,6 +466,43 @@ function renderHome() {
       </div>
     </section>
 
+    <aside
+      class="forecastTicker"
+      aria-label="${escapeHtml(
+        home.forecastTickerLabel ||
+        'WC26 forecast game'
+      )}"
+    >
+      <span>
+        ${escapeHtml(
+          home.forecastTickerIntro ||
+          'Predict every match. Pick the score.'
+        )}
+      </span>
+
+      <a
+        class="forecastTickerButton"
+        href="${escapeHtml(
+          home.forecastTickerUrl ||
+          'https://t.me/mebugo_bot'
+        )}"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        ${escapeHtml(
+          home.forecastTickerButton ||
+          'Join the WC26 forecast'
+        )}
+      </a>
+
+      <span>
+        ${escapeHtml(
+          home.forecastTickerOutro ||
+          'game in Telegram'
+        )}
+      </span>
+    </aside>
+
     <section class="groupList">
       ${groupCards('groupMini')}
     </section>
