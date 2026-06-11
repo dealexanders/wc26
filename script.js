@@ -24,7 +24,8 @@ const escapeHtml = (value = '') =>
 const routes = {
   home: renderHome,
   games: renderGames,
-  table: renderTable
+  table: renderTable,
+  leaderboard: renderLeaderboard
 };
 
 const matchNumber = match =>
@@ -791,6 +792,68 @@ function matchCard(match) {
         </span>
       </div>
     </article>
+  `;
+}
+
+async function renderLeaderboard() {
+  const app = $('#app');
+
+  app.innerHTML = `
+    <section class="panel">
+      <h1>Leaderboard</h1>
+      <p>Forecasters ranked by points from finished matches.</p>
+      <div id="leaderboardTable">Loading leaderboard…</div>
+    </section>
+  `;
+
+  try {
+    const response = await fetchJson('leaderboard.php');
+
+    renderLeaderboardTable(
+      $('#leaderboardTable'),
+      response.leaderboard || []
+    );
+  } catch (error) {
+    $('#leaderboardTable').innerHTML = `
+      <p class="loadError">
+        ${escapeHtml(error.message)}
+      </p>
+    `;
+  }
+}
+
+function renderLeaderboardTable(container, rows) {
+  if (!rows.length) {
+    container.innerHTML = `
+      <p>No scored forecasts yet.</p>
+    `;
+    return;
+  }
+
+  container.innerHTML = `
+    <div class="leaderboardList">
+      ${rows.map(row => `
+        <article class="leaderboardRow">
+          <strong class="leaderboardPosition">
+            #${escapeHtml(row.position)}
+          </strong>
+
+          <span class="leaderboardName">
+            ${escapeHtml(row.user_name)}
+          </span>
+
+          <strong class="leaderboardPoints">
+            ${escapeHtml(row.total_points)} pts
+          </strong>
+
+          <span class="leaderboardMeta">
+            ${escapeHtml(row.scored_forecasts)} matches ·
+            ${escapeHtml(row.correct_outcomes)} outcomes ·
+            ${escapeHtml(row.exact_full_scores)} exact scores
+          </span>
+        </article>
+      `).join('')}
+    </div>
   `;
 }
 
