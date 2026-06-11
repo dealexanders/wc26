@@ -329,10 +329,8 @@ async function loadVotingData() {
       },
     ])
   );
-  selectedDateKey = getNextMatchDateKey(currentMatches);
-
   renderMatchCalendar(currentMatches);
-  renderSelectedDateMatches();
+  showCalendarView();
 }
 
 function scoreWheel(matchId, side, value, enabled = true) {
@@ -433,11 +431,7 @@ function renderSelectedDateMatches() {
   const container = document.querySelector('#matches');
   const title = document.querySelector('#selectedDayTitle');
 
-  if (!selectedDateKey) {
-    title.textContent = 'Select a match date';
-    container.innerHTML = '';
-    return;
-  }
+  if (!selectedDateKey) return;
 
   title.textContent = formatDateTitle(selectedDateKey);
   const selectedMatches = currentMatches
@@ -454,6 +448,22 @@ function renderSelectedDateMatches() {
 
   container.innerHTML = selectedMatches.map(renderForecastCard).join('');
   initializeScoreWheels(container);
+}
+
+function showCalendarView() {
+  selectedDateKey = null;
+  document.querySelector('.calendar-section').hidden = false;
+  document.querySelector('.selected-day-section').hidden = true;
+}
+
+function showDateList(dateKey) {
+  if (!dateKey) return;
+
+  selectedDateKey = dateKey;
+  renderSelectedDateMatches();
+  document.querySelector('.calendar-section').hidden = true;
+  document.querySelector('.selected-day-section').hidden = false;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function calculateDisplayedOutcome(homeScore, awayScore) {
@@ -525,15 +535,16 @@ document.addEventListener('click', event => {
 
   if (!dayButton) return;
 
-  selectedDateKey = dayButton.dataset.dateKey;
-  renderMatchCalendar(currentMatches);
-  renderSelectedDateMatches();
+  showDateList(dayButton.dataset.dateKey);
 });
 
 document.querySelector('#showTodayMatches').addEventListener('click', () => {
-  selectedDateKey = getNextMatchDateKey(currentMatches);
-  renderMatchCalendar(currentMatches);
-  renderSelectedDateMatches();
+  showDateList(getNextMatchDateKey(currentMatches));
+});
+
+document.querySelector('#backToCalendar').addEventListener('click', () => {
+  showCalendarView();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 });
 
 document.addEventListener('scroll', event => {
@@ -647,7 +658,8 @@ document.addEventListener('click', async event => {
 
 loadVotingData().catch(error => {
   console.error('Mini App loading failed:', error);
-  document.querySelector('#matches').innerHTML = `
+  showCalendarView();
+  document.querySelector('#matchCalendar').innerHTML = `
     <p class="error-message">
       Mini App loading failed:<br>
       ${escapeHtml(error.message)}
