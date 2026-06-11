@@ -280,14 +280,25 @@ header h1 {
   font-size: 20px;
 }
 
-#showTodayMatches {
+#showTodayMatches,
+#backToCalendar {
   border: 0;
-  border-radius: 999px;
-  padding: 8px 12px;
   background: var(--tg-button);
   color: var(--tg-button-text);
   font-weight: 700;
   cursor: pointer;
+}
+
+#showTodayMatches {
+  border-radius: 999px;
+  padding: 8px 12px;
+}
+
+#backToCalendar {
+  width: 100%;
+  margin-top: 18px;
+  padding: 14px 18px;
+  border-radius: var(--radius);
 }
 
 .match-calendar {
