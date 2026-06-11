@@ -262,3 +262,200 @@ header h1 {
     font-size: 28px;
   }
 }
+
+.calendar-section {
+  margin-bottom: 24px;
+}
+
+.calendar-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.calendar-toolbar h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+#showTodayMatches {
+  border: 0;
+  border-radius: 999px;
+  padding: 8px 12px;
+  background: var(--tg-button);
+  color: var(--tg-button-text);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.match-calendar {
+  display: grid;
+  gap: 28px;
+}
+
+.calendar-month h3 {
+  margin: 0 0 14px;
+  text-align: center;
+  font-size: 22px;
+}
+
+.calendar-weekdays,
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.calendar-weekdays {
+  margin-bottom: 8px;
+  color: var(--tg-hint);
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.calendar-grid {
+  gap: 8px 6px;
+}
+
+.calendar-empty {
+  min-height: 44px;
+}
+
+.calendar-day {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--tg-text);
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.calendar-day:disabled {
+  opacity: 0.35;
+}
+
+.calendar-day.has-matches {
+  cursor: pointer;
+  opacity: 1;
+}
+
+.calendar-day-number {
+  position: relative;
+  z-index: 2;
+}
+
+.calendar-match-count {
+  position: absolute;
+  right: 2px;
+  bottom: 0;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  background: var(--tg-button);
+  color: var(--tg-button-text);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.soccer-date-bg {
+  position: absolute;
+  inset: 2px;
+  z-index: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 50%, #111 0 16%, transparent 17%),
+    radial-gradient(circle at 20% 25%, #111 0 10%, transparent 11%),
+    radial-gradient(circle at 80% 25%, #111 0 10%, transparent 11%),
+    radial-gradient(circle at 25% 78%, #111 0 10%, transparent 11%),
+    radial-gradient(circle at 75% 78%, #111 0 10%, transparent 11%),
+    #f8f8f8;
+  box-shadow:
+    inset 0 0 0 2px #111,
+    0 3px 8px rgba(0, 0, 0, 0.18);
+}
+
+.calendar-day.has-matches .calendar-day-number {
+  color: #fff;
+  font-weight: 900;
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.95),
+    0 0 5px rgba(0, 0, 0, 0.95);
+}
+
+.calendar-day.selected .soccer-date-bg {
+  transform: scale(1.08);
+  box-shadow:
+    inset 0 0 0 3px var(--tg-button),
+    0 0 0 3px rgba(36, 129, 204, 0.25),
+    0 5px 14px rgba(0, 0, 0, 0.28);
+}
+
+.calendar-day.selected .calendar-day-number {
+  color: #fff;
+}
+
+.selected-day-section {
+  margin-top: 8px;
+}
+
+.selected-day-section h2 {
+  margin: 0 0 12px;
+  font-size: 21px;
+}
+
+.vote-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.vote-card-passed {
+  min-height: 180px;
+}
+
+.vote-card-passed .score-matchup,
+.vote-card-passed .forecast-outcome,
+.vote-card-passed .forecast-save-button,
+.vote-card-passed .vote-message {
+  pointer-events: none;
+}
+
+.vote-card-passed .score-wheel-window {
+  overflow: hidden;
+}
+
+.passed-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  background:
+    linear-gradient(
+      135deg,
+      rgba(120, 0, 20, 0.58),
+      rgba(180, 20, 20, 0.42)
+    );
+  backdrop-filter: blur(1px);
+}
+
+.passed-overlay span {
+  transform: rotate(-12deg);
+  padding: 10px 24px;
+  border: 3px solid rgba(255, 255, 255, 0.9);
+  border-radius: 999px;
+  color: #fff;
+  font-size: 28px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.6);
+}

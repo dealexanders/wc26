@@ -24,8 +24,24 @@
     <p id="userGreeting"></p>
   </header>
 
-  <main id="matches"></main>
+  <main>
+    <section class="calendar-section">
+      <div class="calendar-toolbar">
+        <h2 id="calendarTitle">Match calendar</h2>
+        <button id="showTodayMatches" type="button">
+          Next match day
+        </button>
+      </div>
 
-  <script src="miniapp.js?v=9"></script>
+      <div id="matchCalendar" class="match-calendar"></div>
+    </section>
+
+    <section class="selected-day-section">
+      <h2 id="selectedDayTitle">Select a match date</h2>
+      <div id="matches"></div>
+    </section>
+  </main>
+
+  <script src="miniapp.js?v=10"></script>
 </body>
 </html>
