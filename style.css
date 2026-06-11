@@ -164,3 +164,37 @@
     width: 100%;
   }
 }
+
+.leaderboardList {
+  display: grid;
+  gap: 12px;
+}
+
+.leaderboardRow {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 14px;
+  border-radius: 16px;
+  background: rgba(0, 0, 0, 0.045);
+}
+
+.leaderboardPosition {
+  font-size: 18px;
+}
+
+.leaderboardName {
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.leaderboardPoints {
+  font-size: 18px;
+}
+
+.leaderboardMeta {
+  grid-column: 2 / 4;
+  color: var(--muted);
+  font-size: 14px;
+}
