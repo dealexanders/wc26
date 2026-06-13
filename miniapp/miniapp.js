@@ -348,31 +348,25 @@ function renderForecastCard(match) {
   const homeScore = existing?.homeScore ?? 0;
   const awayScore = existing?.awayScore ?? 0;
   const hasSavedForecast = Boolean(existing);
-  const forecastOpen = isForecastOpen(match);
-  const cardStateClass = forecastOpen
-    ? hasSavedForecast
-      ? 'is-saved is-locked'
-      : 'is-editing'
-    : 'vote-card-passed is-locked';
+  const cardStateClass = hasSavedForecast ? 'is-saved is-locked' : 'is-editing';
   const outcome = calculateDisplayedOutcome(homeScore, awayScore);
 
   return `
-    <article class="vote-card forecast-card ${cardStateClass}" data-match-id="${match.id}" data-forecast-open="${forecastOpen ? 'true' : 'false'}" data-has-saved-forecast="${hasSavedForecast ? 'true' : 'false'}">
+    <article class="vote-card forecast-card ${cardStateClass}" data-match-id="${match.id}" data-has-saved-forecast="${hasSavedForecast ? 'true' : 'false'}">
       <div class="vote-meta">Match ${escapeHtml(match.match_number)} · ${escapeHtml(formatMatchTime(match))}</div>
       <div class="forecast-editor">
         <div class="score-matchup">
-          <div class="score-team"><h2>${escapeHtml(match.home_team_name)}</h2>${scoreSelector(match.id, 'home', homeScore, hasSavedForecast || !forecastOpen)}</div>
+          <div class="score-team"><h2>${escapeHtml(match.home_team_name)}</h2>${scoreSelector(match.id, 'home', homeScore, hasSavedForecast)}</div>
           <div class="versus-label">VS</div>
-          <div class="score-team"><h2>${escapeHtml(match.away_team_name)}</h2>${scoreSelector(match.id, 'away', awayScore, hasSavedForecast || !forecastOpen)}</div>
+          <div class="score-team"><h2>${escapeHtml(match.away_team_name)}</h2>${scoreSelector(match.id, 'away', awayScore, hasSavedForecast)}</div>
         </div>
-        ${forecastOpen ? '<button type="button" class="forecast-edit-overlay" aria-label="Edit forecast">✏️</button>' : ''}
+        <button type="button" class="forecast-edit-overlay" aria-label="Edit forecast">✏️</button>
       </div>
       <p class="forecast-outcome">${escapeHtml(formatOutcome(outcome, match.home_team_name, match.away_team_name))}</p>
       <div class="forecast-actions">
-        <button type="button" class="forecast-save-button ${hasSavedForecast ? 'is-confirmed' : 'is-save'}" ${hasSavedForecast || !forecastOpen ? 'disabled' : ''}>${hasSavedForecast ? '✓' : 'Save'}</button>
+        <button type="button" class="forecast-save-button ${hasSavedForecast ? 'is-confirmed' : 'is-save'}" ${hasSavedForecast ? 'disabled' : ''}>${hasSavedForecast ? '✓' : 'Save'}</button>
       </div>
-      <p class="vote-message" aria-live="polite">${forecastOpen ? hasSavedForecast ? `Saved: ${homeScore}–${awayScore}` : 'Enter score and tap Save' : 'Forecasting is closed'}</p>
-      ${forecastOpen ? '' : '<div class="passed-overlay" aria-hidden="true"><span>PASSED</span></div>'}
+      <p class="vote-message" aria-live="polite">${hasSavedForecast ? `Saved: ${homeScore}–${awayScore}` : 'Enter score and tap Save'}</p>
     </article>
   `;
 }
@@ -385,11 +379,11 @@ function renderSelectedDateMatches() {
 
   title.textContent = formatDateTitle(selectedDateKey);
   const selectedMatches = currentMatches
-    .filter(match => getMatchDateKey(match) === selectedDateKey)
+    .filter(match => getMatchDateKey(match) === selectedDateKey && isForecastOpen(match))
     .sort((a, b) => new Date(`${a.kickoff_at_utc}Z`).getTime() - new Date(`${b.kickoff_at_utc}Z`).getTime());
 
   if (!selectedMatches.length) {
-    container.innerHTML = '<p class="empty-state">No matches on this date.</p>';
+    container.innerHTML = '<p class="empty-state">No matches open for forecasting on this date.</p>';
     return;
   }
 
