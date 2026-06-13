@@ -445,6 +445,8 @@ function lockForecastCard(card, homeScore, awayScore) {
 }
 
 function unlockForecastCard(card) {
+  if (card.dataset.forecastOpen !== 'true') return;
+
   card.classList.remove('is-locked');
   card.classList.add('is-editing');
   card.querySelectorAll('.score-step').forEach(button => { button.disabled = false; });
@@ -515,7 +517,7 @@ document.addEventListener('click', async event => {
   const saveButton = event.target.closest('.forecast-save-button');
   if (!saveButton) return;
   const card = saveButton.closest('.forecast-card');
-  if (!card || card.classList.contains('is-locked')) return;
+  if (!card || card.dataset.forecastOpen !== 'true' || card.classList.contains('is-locked')) return;
   await saveForecast(card);
 });
 
