@@ -802,6 +802,23 @@ async function renderLeaderboard() {
     <section class="panel">
       <h1>Leaderboard</h1>
       <p>Forecasters ranked by points from finished matches.</p>
+      <aside class="leaderboardScoring">
+        <h2>How the leaderboard is built</h2>
+        <p>
+          After each finished match, every forecaster earns points for
+          their prediction. All conditions are cumulative:
+        </p>
+        <ul>
+          <li><strong>+6</strong> Correct outcome: Team 1 win, draw, or Team 2 win</li>
+          <li><strong>+1</strong> Exact score of at least one team</li>
+          <li><strong>+1</strong> Exact goal difference</li>
+          <li><strong>+1</strong> Exact full score bonus</li>
+        </ul>
+        <p>
+          The leaderboard is built by adding together each forecaster's
+          points from all finished matches.
+        </p>
+      </aside>
       <div id="leaderboardTable">Loading leaderboard…</div>
     </section>
   `;
