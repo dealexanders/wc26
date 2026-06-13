@@ -333,39 +333,12 @@ async function loadVotingData() {
   showCalendarView();
 }
 
-function scoreWheel(matchId, side, value, enabled = true) {
-  const numbers = Array.from(
-    { length: SCORE_MAX - SCORE_MIN + 1 },
-    (_, index) => SCORE_MIN + index
-  );
-  const disabledAttribute = enabled ? '' : 'disabled';
-
+function scoreSelector(matchId, side, value, locked) {
   return `
-    <div class="score-wheel" data-match-id="${matchId}" data-side="${side}" data-value="${value}">
-      <div
-        class="score-wheel-window"
-        tabindex="${enabled ? '0' : '-1'}"
-        role="spinbutton"
-        aria-valuemin="${SCORE_MIN}"
-        aria-valuemax="${SCORE_MAX}"
-        aria-valuenow="${value}"
-        aria-label="${side === 'home' ? 'First team score' : 'Second team score'}"
-        aria-disabled="${enabled ? 'false' : 'true'}"
-      >
-        <div class="score-wheel-list">
-          ${numbers.map(number => `
-            <button
-              type="button"
-              class="score-wheel-item ${number === value ? 'active' : ''}"
-              data-score="${number}"
-              tabindex="-1"
-              ${disabledAttribute}
-            >
-              ${number}
-            </button>
-          `).join('')}
-        </div>
-      </div>
+    <div class="score-selector" data-match-id="${matchId}" data-side="${side}">
+      <button type="button" class="score-step score-up" aria-label="Increase score" ${locked ? 'disabled' : ''}>▲</button>
+      <output class="score-value" aria-live="polite">${value}</output>
+      <button type="button" class="score-step score-down" aria-label="Decrease score" ${locked ? 'disabled' : ''}>▼</button>
     </div>
   `;
 }
@@ -374,55 +347,26 @@ function renderForecastCard(match) {
   const existing = currentForecastsByMatch.get(Number(match.id));
   const homeScore = existing?.homeScore ?? 0;
   const awayScore = existing?.awayScore ?? 0;
+  const hasSavedForecast = Boolean(existing);
+  const cardStateClass = hasSavedForecast ? 'is-saved is-locked' : 'is-editing';
   const outcome = calculateDisplayedOutcome(homeScore, awayScore);
-  const forecastOpen = isForecastOpen(match);
 
   return `
-    <article
-      class="vote-card ${forecastOpen ? '' : 'vote-card-passed'}"
-      data-match-id="${match.id}"
-      data-dirty="false"
-      data-forecast-open="${forecastOpen ? 'true' : 'false'}"
-      data-has-saved-forecast="${existing ? 'true' : 'false'}"
-    >
-      <div class="vote-meta">
-        Match ${escapeHtml(match.match_number)} · ${escapeHtml(formatMatchTime(match))}
+    <article class="vote-card forecast-card ${cardStateClass}" data-match-id="${match.id}" data-has-saved-forecast="${hasSavedForecast ? 'true' : 'false'}">
+      <div class="vote-meta">Match ${escapeHtml(match.match_number)} · ${escapeHtml(formatMatchTime(match))}</div>
+      <div class="forecast-editor">
+        <div class="score-matchup">
+          <div class="score-team"><h2>${escapeHtml(match.home_team_name)}</h2>${scoreSelector(match.id, 'home', homeScore, hasSavedForecast)}</div>
+          <div class="versus-label">VS</div>
+          <div class="score-team"><h2>${escapeHtml(match.away_team_name)}</h2>${scoreSelector(match.id, 'away', awayScore, hasSavedForecast)}</div>
+        </div>
+        <button type="button" class="forecast-edit-overlay" aria-label="Edit forecast">✏️</button>
       </div>
-      <div class="score-matchup">
-        <div class="score-team">
-          <h2>${escapeHtml(match.home_team_name)}</h2>
-          ${scoreWheel(match.id, 'home', homeScore, forecastOpen)}
-        </div>
-        <div class="versus-label">VS</div>
-        <div class="score-team">
-          <h2>${escapeHtml(match.away_team_name)}</h2>
-          ${scoreWheel(match.id, 'away', awayScore, forecastOpen)}
-        </div>
+      <p class="forecast-outcome">${escapeHtml(formatOutcome(outcome, match.home_team_name, match.away_team_name))}</p>
+      <div class="forecast-actions">
+        <button type="button" class="forecast-save-button ${hasSavedForecast ? 'is-confirmed' : 'is-save'}" ${hasSavedForecast ? 'disabled' : ''}>${hasSavedForecast ? '✓' : 'Save'}</button>
       </div>
-      <p class="forecast-outcome">
-        ${escapeHtml(formatOutcome(outcome, match.home_team_name, match.away_team_name))}
-      </p>
-      <button
-        type="button"
-        class="forecast-save-button"
-        data-match-id="${match.id}"
-        aria-label="Save forecast"
-        ${forecastOpen ? '' : 'disabled'}
-      >
-        ✓
-      </button>
-      <p class="vote-message" aria-live="polite">
-        ${forecastOpen
-          ? existing
-            ? `Saved: ${homeScore}–${awayScore}`
-            : 'Select score and tap ✓ to save'
-          : 'Forecasting is closed'}
-      </p>
-      ${forecastOpen ? '' : `
-        <div class="passed-overlay" aria-hidden="true">
-          <span>PASSED</span>
-        </div>
-      `}
+      <p class="vote-message" aria-live="polite">${hasSavedForecast ? `Saved: ${homeScore}–${awayScore}` : 'Enter score and tap Save'}</p>
     </article>
   `;
 }
@@ -435,19 +379,15 @@ function renderSelectedDateMatches() {
 
   title.textContent = formatDateTitle(selectedDateKey);
   const selectedMatches = currentMatches
-    .filter(match => getMatchDateKey(match) === selectedDateKey)
-    .sort((a, b) => (
-      new Date(`${a.kickoff_at_utc}Z`).getTime() -
-      new Date(`${b.kickoff_at_utc}Z`).getTime()
-    ));
+    .filter(match => getMatchDateKey(match) === selectedDateKey && isForecastOpen(match))
+    .sort((a, b) => new Date(`${a.kickoff_at_utc}Z`).getTime() - new Date(`${b.kickoff_at_utc}Z`).getTime());
 
   if (!selectedMatches.length) {
-    container.innerHTML = '<p class="empty-state">No matches on this date.</p>';
+    container.innerHTML = '<p class="empty-state">No matches open for forecasting on this date.</p>';
     return;
   }
 
   container.innerHTML = selectedMatches.map(renderForecastCard).join('');
-  initializeScoreWheels(container);
 }
 
 function showCalendarView() {
@@ -480,54 +420,65 @@ function formatOutcome(outcome, homeName, awayName) {
 
 function getCardScores(card) {
   return {
-    homeScore: Number(card.querySelector('.score-wheel[data-side="home"]').dataset.value),
-    awayScore: Number(card.querySelector('.score-wheel[data-side="away"]').dataset.value),
+    homeScore: Number(card.querySelector('.score-selector[data-side="home"] .score-value').textContent),
+    awayScore: Number(card.querySelector('.score-selector[data-side="away"] .score-value').textContent),
   };
 }
 
 function updateCardOutcome(card) {
   const { homeScore, awayScore } = getCardScores(card);
   const match = currentMatches.find(item => Number(item.id) === Number(card.dataset.matchId));
-  const outcome = calculateDisplayedOutcome(homeScore, awayScore);
-
-  card.querySelector('.forecast-outcome').textContent = formatOutcome(
-    outcome,
-    match.home_team_name,
-    match.away_team_name
-  );
+  card.querySelector('.forecast-outcome').textContent = formatOutcome(calculateDisplayedOutcome(homeScore, awayScore), match.home_team_name, match.away_team_name);
 }
 
-function initializeScoreWheels(root = document) {
-  root.querySelectorAll('.score-wheel').forEach(wheel => {
-    const windowElement = wheel.querySelector('.score-wheel-window');
-    windowElement.scrollTop = Number(wheel.dataset.value) * SCORE_ITEM_HEIGHT;
-    updateWheelSelection(wheel);
-  });
+function lockForecastCard(card, homeScore, awayScore) {
+  card.classList.add('is-saved', 'is-locked');
+  card.classList.remove('is-editing');
+  card.dataset.hasSavedForecast = 'true';
+  card.querySelectorAll('.score-step').forEach(button => { button.disabled = true; });
+  const saveButton = card.querySelector('.forecast-save-button');
+  saveButton.textContent = '✓';
+  saveButton.classList.remove('is-save');
+  saveButton.classList.add('is-confirmed');
+  saveButton.disabled = true;
+  card.querySelector('.vote-message').textContent = `Saved: ${homeScore}–${awayScore}`;
 }
 
-function updateWheelSelection(wheel) {
-  const windowElement = wheel.querySelector('.score-wheel-window');
-  const items = [...wheel.querySelectorAll('.score-wheel-item')];
-  const selectedScore = Math.round(windowElement.scrollTop / SCORE_ITEM_HEIGHT);
-  const safeScore = Math.min(SCORE_MAX, Math.max(SCORE_MIN, selectedScore));
+function unlockForecastCard(card) {
+  card.classList.remove('is-locked');
+  card.classList.add('is-editing');
+  card.querySelectorAll('.score-step').forEach(button => { button.disabled = false; });
+  const saveButton = card.querySelector('.forecast-save-button');
+  saveButton.textContent = 'Save';
+  saveButton.classList.remove('is-confirmed');
+  saveButton.classList.add('is-save');
+  saveButton.disabled = false;
+  card.querySelector('.vote-message').textContent = 'Edit score and tap Save.';
+}
 
-  wheel.dataset.value = String(safeScore);
-  windowElement.setAttribute('aria-valuenow', String(safeScore));
-  items.forEach(item => item.classList.toggle('active', Number(item.dataset.score) === safeScore));
+async function saveForecast(card) {
+  const matchId = Number(card.dataset.matchId);
+  const { homeScore, awayScore } = getCardScores(card);
+  const saveButton = card.querySelector('.forecast-save-button');
+  const message = card.querySelector('.vote-message');
+  card.querySelectorAll('.score-step').forEach(button => { button.disabled = true; });
+  saveButton.disabled = true;
+  saveButton.textContent = 'Saving…';
+  message.textContent = 'Saving forecast…';
 
-  const expectedScrollTop = safeScore * SCORE_ITEM_HEIGHT;
-
-  if (Math.abs(windowElement.scrollTop - expectedScrollTop) > 1) {
-    windowElement.scrollTo({ top: expectedScrollTop, behavior: 'smooth' });
+  try {
+    const response = await telegramFetch('vote.php', { method: 'POST', body: JSON.stringify({ match_id: matchId, home_score: homeScore, away_score: awayScore }) });
+    currentForecastsByMatch.set(matchId, { homeScore, awayScore, outcome: response.forecast.outcome });
+    console.log('Forecast saved:', response.forecast);
+    lockForecastCard(card, homeScore, awayScore);
+    tg.HapticFeedback?.notificationOccurred('success');
+  } catch (error) {
+    card.querySelectorAll('.score-step').forEach(button => { button.disabled = false; });
+    saveButton.disabled = false;
+    saveButton.textContent = 'Save';
+    message.textContent = error.message;
+    tg.HapticFeedback?.notificationOccurred('error');
   }
-}
-
-function markCardChanged(card) {
-  if (card.dataset.forecastOpen !== 'true') return;
-
-  card.dataset.dirty = 'true';
-  updateCardOutcome(card);
-  card.querySelector('.vote-message').textContent = 'Forecast changed. Tap ✓ to save.';
 }
 
 document.addEventListener('click', event => {
@@ -547,113 +498,32 @@ document.querySelector('#backToCalendar').addEventListener('click', () => {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 });
 
-document.addEventListener('scroll', event => {
-  const windowElement = event.target.closest?.('.score-wheel-window');
-
-  if (!windowElement) return;
-
-  const wheel = windowElement.closest('.score-wheel');
-  const card = wheel.closest('.vote-card');
-
-  if (card.dataset.forecastOpen !== 'true') return;
-
-  clearTimeout(windowElement.dataset.scrollTimerId);
-  const timerId = setTimeout(() => {
-    updateWheelSelection(wheel);
-    markCardChanged(card);
-  }, 120);
-
-  windowElement.dataset.scrollTimerId = String(timerId);
-}, true);
-
 document.addEventListener('click', event => {
-  const item = event.target.closest('.score-wheel-item');
-
-  if (!item) return;
-
-  const card = item.closest('.vote-card');
-
-  if (card.dataset.forecastOpen !== 'true') return;
-
-  const wheel = item.closest('.score-wheel');
-  const windowElement = wheel.querySelector('.score-wheel-window');
-  const score = Number(item.dataset.score);
-
-  windowElement.scrollTo({ top: score * SCORE_ITEM_HEIGHT, behavior: 'smooth' });
-  wheel.dataset.value = String(score);
-  updateWheelSelection(wheel);
-  markCardChanged(card);
-});
-
-document.addEventListener('keydown', event => {
-  const windowElement = event.target.closest('.score-wheel-window');
-
-  if (!windowElement || !['ArrowUp', 'ArrowDown'].includes(event.key)) return;
-
-  const card = windowElement.closest('.vote-card');
-
-  if (card.dataset.forecastOpen !== 'true') return;
-
-  event.preventDefault();
-  const wheel = windowElement.closest('.score-wheel');
-  const currentValue = Number(wheel.dataset.value);
-  const nextValue = event.key === 'ArrowUp'
-    ? Math.max(SCORE_MIN, currentValue - 1)
-    : Math.min(SCORE_MAX, currentValue + 1);
-
-  windowElement.scrollTo({ top: nextValue * SCORE_ITEM_HEIGHT, behavior: 'smooth' });
-  wheel.dataset.value = String(nextValue);
-  updateWheelSelection(wheel);
-  markCardChanged(card);
+  const stepButton = event.target.closest('.score-step');
+  if (!stepButton) return;
+  const card = stepButton.closest('.forecast-card');
+  if (!card || card.classList.contains('is-locked')) return;
+  const output = stepButton.closest('.score-selector').querySelector('.score-value');
+  let value = Number(output.textContent);
+  value = stepButton.classList.contains('score-up') ? Math.min(value + 1, SCORE_MAX) : Math.max(value - 1, SCORE_MIN);
+  output.textContent = String(value);
+  updateCardOutcome(card);
+  card.querySelector('.vote-message').textContent = 'Forecast changed. Tap Save.';
 });
 
 document.addEventListener('click', async event => {
   const saveButton = event.target.closest('.forecast-save-button');
-
   if (!saveButton) return;
+  const card = saveButton.closest('.forecast-card');
+  if (!card || card.classList.contains('is-locked')) return;
+  await saveForecast(card);
+});
 
-  const card = saveButton.closest('.vote-card');
-
-  if (card.dataset.forecastOpen !== 'true') return;
-
-  const matchId = Number(card.dataset.matchId);
-  const { homeScore, awayScore } = getCardScores(card);
-  const message = card.querySelector('.vote-message');
-
-  saveButton.disabled = true;
-  card.querySelectorAll('.score-wheel-window').forEach(item => {
-    item.setAttribute('aria-disabled', 'true');
-  });
-  message.textContent = 'Saving forecast…';
-
-  try {
-    const response = await telegramFetch('vote.php', {
-      method: 'POST',
-      body: JSON.stringify({
-        match_id: matchId,
-        home_score: homeScore,
-        away_score: awayScore,
-      }),
-    });
-
-    currentForecastsByMatch.set(matchId, {
-      homeScore,
-      awayScore,
-      outcome: response.forecast.outcome,
-    });
-    card.dataset.dirty = 'false';
-    card.dataset.hasSavedForecast = 'true';
-    message.textContent = `Saved: ${homeScore}–${awayScore}`;
-    tg.HapticFeedback?.notificationOccurred('success');
-  } catch (error) {
-    message.textContent = error.message;
-    tg.HapticFeedback?.notificationOccurred('error');
-  } finally {
-    saveButton.disabled = false;
-    card.querySelectorAll('.score-wheel-window').forEach(item => {
-      item.setAttribute('aria-disabled', 'false');
-    });
-  }
+document.addEventListener('click', event => {
+  const editButton = event.target.closest('.forecast-edit-overlay');
+  if (!editButton) return;
+  const card = editButton.closest('.forecast-card');
+  if (card) unlockForecastCard(card);
 });
 
 loadVotingData().catch(error => {
