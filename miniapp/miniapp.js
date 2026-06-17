@@ -250,6 +250,17 @@ function getNextMatchDateKey(matches) {
   return sorted.length ? getMatchDateKey(sorted[0]) : null;
 }
 
+function getAvailableMatchDateKeys() {
+  return [...groupMatchesByDate(currentMatches).keys()].sort();
+}
+
+function getNextSelectedDateKey() {
+  const dateKeys = getAvailableMatchDateKeys();
+  const currentIndex = dateKeys.indexOf(selectedDateKey);
+
+  return dateKeys[currentIndex + 1] || null;
+}
+
 function isForecastOpen(match) {
   const closesAt = new Date(`${match.voting_closes_at_utc}Z`).getTime();
 
@@ -381,10 +392,21 @@ function renderForecastCard(match) {
 function renderSelectedDateMatches() {
   const container = document.querySelector('#matches');
   const title = document.querySelector('#selectedDayTitle');
+  const nextDayButton = document.querySelector('#nextDayButton');
 
   if (!selectedDateKey) return;
 
   title.textContent = formatDateTitle(selectedDateKey);
+
+  const nextDateKey = getNextSelectedDateKey();
+  nextDayButton.disabled = !nextDateKey;
+  nextDayButton.setAttribute(
+    'aria-label',
+    nextDateKey
+      ? `Open matches for ${formatDateTitle(nextDateKey)}`
+      : 'No next match day available'
+  );
+
   const selectedMatches = currentMatches
     .filter(match => getMatchDateKey(match) === selectedDateKey)
     .sort((a, b) => new Date(`${a.kickoff_at_utc}Z`).getTime() - new Date(`${b.kickoff_at_utc}Z`).getTime());
@@ -505,6 +527,14 @@ document.querySelector('#showTodayMatches').addEventListener('click', () => {
 document.querySelector('#backToCalendar').addEventListener('click', () => {
   showCalendarView();
   window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+document.querySelector('#nextDayButton').addEventListener('click', () => {
+  const nextDateKey = getNextSelectedDateKey();
+
+  if (!nextDateKey) return;
+
+  showDateList(nextDateKey);
 });
 
 document.addEventListener('click', event => {
