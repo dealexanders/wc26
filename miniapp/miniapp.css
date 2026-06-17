@@ -211,6 +211,50 @@ header h1 {
   cursor: wait;
 }
 
+.selected-day-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 18px 0 0;
+}
+
+.day-nav-button {
+  min-height: 44px;
+  border: 0;
+  border-radius: 999px;
+  padding: 11px 15px;
+  background: var(--tg-button);
+  color: var(--tg-button-text);
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.back-button {
+  margin-right: auto;
+}
+
+.next-day-button {
+  margin-left: auto;
+}
+
+.next-day-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+@media (max-width: 380px) {
+  .selected-day-actions {
+    gap: 8px;
+  }
+
+  .day-nav-button {
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+}
+
 .vote-message {
   min-height: 22px;
   text-align: center;
@@ -280,8 +324,7 @@ header h1 {
   font-size: 20px;
 }
 
-#showTodayMatches,
-#backToCalendar {
+#showTodayMatches {
   border: 0;
   background: var(--tg-button);
   color: var(--tg-button-text);
@@ -292,13 +335,6 @@ header h1 {
 #showTodayMatches {
   border-radius: 999px;
   padding: 8px 12px;
-}
-
-#backToCalendar {
-  width: 100%;
-  margin-top: 18px;
-  padding: 14px 18px;
-  border-radius: var(--radius);
 }
 
 .match-calendar {
