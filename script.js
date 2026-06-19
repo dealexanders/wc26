@@ -1017,6 +1017,42 @@ async function openForecastDetails(
   }
 }
 
+function getScoreTierClass(forecast) {
+  if (
+    forecast.points === null ||
+    forecast.points === undefined
+  ) {
+    return 'score-tier-pending';
+  }
+
+  const points = Number(forecast.points);
+
+  if (
+    Number.isNaN(points) ||
+    points < 0 ||
+    points > 9
+  ) {
+    return 'score-tier-pending';
+  }
+
+  return `score-tier-${points}`;
+}
+
+function getPointsLabel(forecast) {
+  if (
+    forecast.points === null ||
+    forecast.points === undefined
+  ) {
+    return '–';
+  }
+
+  const points = Number(forecast.points);
+
+  return points === 0
+    ? '0'
+    : `+${points}`;
+}
+
 function renderForecastDetails(
   container,
   forecasts,
@@ -1031,44 +1067,62 @@ function renderForecastDetails(
   }
 
   const homeName =
-    DATA.teams[match.team1]?.name
-    || match.team1;
+    DATA.teams[match.team1]?.name ||
+    match.team1;
 
   const awayName =
-    DATA.teams[match.team2]?.name
-    || match.team2;
+    DATA.teams[match.team2]?.name ||
+    match.team2;
 
   container.innerHTML = `
     <div class="forecastDetailList">
-      ${forecasts.map(forecast => `
-        <article class="forecastDetailRow">
-          <strong>
-            ${escapeHtml(
-              forecast.voter_name
-            )}
-          </strong>
+      ${forecasts.map(forecast => {
+        const tierClass =
+          getScoreTierClass(forecast);
 
-          <span class="forecastDetailScore">
-            ${escapeHtml(
-              forecast.home_score
-            )}
-            –
-            ${escapeHtml(
-              forecast.away_score
-            )}
-          </span>
+        const pointsLabel =
+          getPointsLabel(forecast);
 
-          <span>
-            ${escapeHtml(
-              formatPublicOutcome(
-                forecast.outcome,
-                homeName,
-                awayName
-              )
-            )}
-          </span>
-        </article>
-      `).join('')}
+        return `
+          <article class="forecastDetailRow ${tierClass}">
+            <span
+              class="scoreBadge"
+              title="${escapeHtml(
+                forecast.tier_label ||
+                'Not scored yet'
+              )}"
+            >
+              ${escapeHtml(pointsLabel)}
+            </span>
+
+            <strong>
+              ${escapeHtml(
+                forecast.voter_name
+              )}
+            </strong>
+
+            <span class="forecastDetailScore">
+              ${escapeHtml(
+                forecast.home_score
+              )}
+              –
+              ${escapeHtml(
+                forecast.away_score
+              )}
+            </span>
+
+            <span>
+              ${escapeHtml(
+                formatPublicOutcome(
+                  forecast.outcome,
+                  homeName,
+                  awayName
+                )
+              )}
+            </span>
+          </article>
+        `;
+      }).join('')}
     </div>
   `;
 }

@@ -94,6 +94,7 @@
 .forecastDetailRow {
   display: grid;
   grid-template-columns:
+    auto
     minmax(0, 1fr)
     auto
     minmax(0, 1fr);
@@ -102,11 +103,126 @@
   padding: 12px;
   border-radius: 12px;
   background: rgba(0, 0, 0, 0.045);
+  border-left: 8px solid transparent;
 }
 
 .forecastDetailScore {
   font-size: 20px;
   font-weight: 800;
+}
+
+.scoreBadge {
+  display: inline-grid;
+  place-items: center;
+  min-width: 42px;
+  height: 32px;
+  padding: 0 10px;
+  border-radius: 999px;
+  font-weight: 900;
+  background: transparent;
+  color: inherit;
+}
+
+.score-tier-9 {
+  border-left-color: var(--score-tier-9);
+}
+
+.score-tier-9 .scoreBadge {
+  background: var(--score-tier-9);
+  color: #111;
+}
+
+.score-tier-8 {
+  border-left-color: var(--score-tier-8);
+}
+
+.score-tier-8 .scoreBadge {
+  background: var(--score-tier-8);
+  color: #111;
+}
+
+.score-tier-7 {
+  border-left-color: var(--score-tier-7);
+}
+
+.score-tier-7 .scoreBadge {
+  background: var(--score-tier-7);
+  color: #fff;
+}
+
+.score-tier-6 {
+  border-left-color: var(--score-tier-6);
+}
+
+.score-tier-6 .scoreBadge {
+  background: var(--score-tier-6);
+  color: #fff;
+}
+
+.score-tier-5 {
+  border-left-color: var(--score-tier-5);
+}
+
+.score-tier-5 .scoreBadge {
+  background: var(--score-tier-5);
+  color: #fff;
+}
+
+.score-tier-4 {
+  border-left-color: var(--score-tier-4);
+}
+
+.score-tier-4 .scoreBadge {
+  background: var(--score-tier-4);
+  color: #fff;
+}
+
+.score-tier-3 {
+  border-left-color: var(--score-tier-3);
+}
+
+.score-tier-3 .scoreBadge {
+  background: var(--score-tier-3);
+  color: #fff;
+}
+
+.score-tier-2 {
+  border-left-color: var(--score-tier-2);
+}
+
+.score-tier-2 .scoreBadge {
+  background: var(--score-tier-2);
+  color: #fff;
+}
+
+.score-tier-1 {
+  border-left-color: var(--score-tier-1);
+}
+
+.score-tier-1 .scoreBadge {
+  background: var(--score-tier-1);
+  color: #fff;
+}
+
+/* 0 points = transparent / no color */
+.score-tier-0 {
+  border-left-color: transparent;
+}
+
+.score-tier-0 .scoreBadge {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.48);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+}
+
+/* Match not scored yet */
+.score-tier-pending {
+  border-left-color: var(--score-tier-pending);
+}
+
+.score-tier-pending .scoreBadge {
+  background: var(--score-tier-pending);
+  color: #111;
 }
 
 .forecastTicker {
@@ -221,4 +337,17 @@
   grid-column: 2 / 4;
   color: var(--muted);
   font-size: 14px;
+}
+
+:root {
+  --score-tier-9: #f2c94c; /* gold */
+  --score-tier-8: #f2994a; /* amber */
+  --score-tier-7: #f97316; /* orange */
+  --score-tier-6: #27ae60; /* green */
+  --score-tier-5: #14b8a6; /* teal */
+  --score-tier-4: #2f80ed; /* blue */
+  --score-tier-3: #828282; /* gray */
+  --score-tier-2: #9b51e0; /* violet */
+  --score-tier-1: #4f46e5; /* indigo */
+  --score-tier-pending: #bdbdbd;
 }
