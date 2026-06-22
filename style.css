@@ -329,6 +329,30 @@
   overflow-wrap: anywhere;
 }
 
+.leaderboardNameButton {
+  width: fit-content;
+  max-width: 100%;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--lime);
+  text-align: left;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+
+.leaderboardNameButton:hover {
+  color: #ffffff;
+}
+
+.leaderboardNameButton:focus-visible {
+  outline: 3px solid var(--lime);
+  outline-offset: 4px;
+  border-radius: 6px;
+}
+
 .leaderboardPoints {
   font-size: 18px;
 }
@@ -337,6 +361,88 @@
   grid-column: 2 / 4;
   color: var(--muted);
   font-size: 14px;
+}
+
+.leaderboardUserSummary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.leaderboardUserSummary div {
+  padding: 12px;
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.08);
+  text-align: center;
+}
+
+.leaderboardUserSummary strong {
+  display: block;
+  font-size: 24px;
+}
+
+.leaderboardUserSummary span {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.leaderboardForecastList {
+  display: grid;
+  gap: 10px;
+}
+
+.leaderboardForecastRow {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.045);
+  border-left: 8px solid transparent;
+}
+
+.leaderboardForecastMain {
+  display: grid;
+  gap: 5px;
+}
+
+.leaderboardForecastMain strong {
+  overflow-wrap: anywhere;
+}
+
+.leaderboardForecastMain span {
+  color: var(--muted);
+}
+
+.leaderboardForecastMain b {
+  color: var(--text);
+}
+
+.leaderboardForecastStatus {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+@media (max-width: 760px) {
+  .leaderboardUserSummary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .leaderboardForecastRow {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .leaderboardForecastStatus {
+    grid-column: 2;
+  }
 }
 
 :root {

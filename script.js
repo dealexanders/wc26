@@ -855,9 +855,14 @@ function renderLeaderboardTable(container, rows) {
             #${escapeHtml(row.position)}
           </strong>
 
-          <span class="leaderboardName">
+          <button
+            type="button"
+            class="leaderboardName leaderboardNameButton"
+            data-user-id="${escapeHtml(row.user_id)}"
+            aria-label="Open forecast statistics for ${escapeHtml(row.user_name)}"
+          >
             ${escapeHtml(row.user_name)}
-          </span>
+          </button>
 
           <strong class="leaderboardPoints">
             ${escapeHtml(row.total_points)} pts
@@ -1142,6 +1147,200 @@ function formatPublicOutcome(
 
   return 'Draw';
 }
+
+function getLeaderboardTeamName(
+  name,
+  code,
+  placeholder
+) {
+  return (
+    name ||
+    code ||
+    placeholder ||
+    'TBC'
+  );
+}
+
+function formatLeaderboardRealScore(forecast) {
+  if (
+    forecast.real_home_score === null ||
+    forecast.real_home_score === undefined ||
+    forecast.real_away_score === null ||
+    forecast.real_away_score === undefined
+  ) {
+    return forecast.status === 'FINISHED'
+      ? 'Score missing'
+      : 'Not played yet';
+  }
+
+  return `${forecast.real_home_score}–${forecast.real_away_score}`;
+}
+
+function formatLeaderboardForecastScore(forecast) {
+  return `${forecast.predicted_home_score}–${forecast.predicted_away_score}`;
+}
+
+function getLeaderboardPointsLabel(forecast) {
+  return getPointsLabel({
+    points: forecast.points_total,
+  });
+}
+
+function getLeaderboardScoreTierClass(forecast) {
+  return getScoreTierClass({
+    points: forecast.points_total,
+  });
+}
+
+async function openLeaderboardUserDetails(userId) {
+  const dialog = $('#forecastDialog');
+  const body = $('#forecastDialogBody');
+
+  $('#forecastDialogTitle').textContent =
+    'Forecaster statistics';
+
+  body.innerHTML = `
+    <p>Loading user forecasts…</p>
+  `;
+
+  dialog.showModal();
+
+  try {
+    const response = await fetchJson(
+      `leaderboard-user.php?user_id=${encodeURIComponent(userId)}`
+    );
+
+    renderLeaderboardUserDetails(
+      body,
+      response.user,
+      response.forecasts || []
+    );
+  } catch (error) {
+    body.innerHTML = `
+      <p class="loadError">
+        ${escapeHtml(error.message)}
+      </p>
+    `;
+  }
+}
+
+function renderLeaderboardUserDetails(
+  container,
+  user,
+  forecasts
+) {
+  $('#forecastDialogTitle').textContent =
+    `${user.user_name} · ${user.total_points} pts`;
+
+  container.innerHTML = `
+    <section class="leaderboardUserSummary">
+      <div>
+        <strong>${escapeHtml(user.total_forecasts)}</strong>
+        <span>Total forecasts</span>
+      </div>
+
+      <div>
+        <strong>${escapeHtml(user.scored_forecasts)}</strong>
+        <span>Scored matches</span>
+      </div>
+
+      <div>
+        <strong>${escapeHtml(user.correct_outcomes)}</strong>
+        <span>Correct outcomes</span>
+      </div>
+
+      <div>
+        <strong>${escapeHtml(user.exact_full_scores)}</strong>
+        <span>Exact scores</span>
+      </div>
+    </section>
+
+    ${
+      forecasts.length
+        ? `
+          <div class="leaderboardForecastList">
+            ${forecasts.map(forecast => {
+              const homeName = getLeaderboardTeamName(
+                forecast.home_team_name,
+                forecast.home_team_code,
+                forecast.home_placeholder
+              );
+
+              const awayName = getLeaderboardTeamName(
+                forecast.away_team_name,
+                forecast.away_team_code,
+                forecast.away_placeholder
+              );
+
+              const tierClass =
+                getLeaderboardScoreTierClass(forecast);
+
+              const pointsLabel =
+                getLeaderboardPointsLabel(forecast);
+
+              return `
+                <article class="leaderboardForecastRow ${tierClass}">
+                  <span
+                    class="scoreBadge"
+                    title="Points for this match"
+                  >
+                    ${escapeHtml(pointsLabel)}
+                  </span>
+
+                  <div class="leaderboardForecastMain">
+                    <strong>
+                      #${escapeHtml(forecast.match_number)}
+                      ${escapeHtml(homeName)}
+                      vs
+                      ${escapeHtml(awayName)}
+                    </strong>
+
+                    <span>
+                      Forecast:
+                      <b>
+                        ${escapeHtml(formatLeaderboardForecastScore(forecast))}
+                      </b>
+                    </span>
+
+                    <span>
+                      Real score:
+                      <b>
+                        ${escapeHtml(formatLeaderboardRealScore(forecast))}
+                      </b>
+                    </span>
+                  </div>
+
+                  <span class="leaderboardForecastStatus">
+                    ${escapeHtml(forecast.status)}
+                  </span>
+                </article>
+              `;
+            }).join('')}
+          </div>
+        `
+        : `
+          <p>No forecasts found for this user.</p>
+        `
+    }
+  `;
+}
+
+document.addEventListener(
+  'click',
+  event => {
+    const leaderboardButton = event.target.closest(
+      '.leaderboardNameButton[data-user-id]'
+    );
+
+    if (!leaderboardButton) {
+      return;
+    }
+
+    openLeaderboardUserDetails(
+      Number(leaderboardButton.dataset.userId)
+    );
+  }
+);
 
 document.addEventListener(
   'click',
