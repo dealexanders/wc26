@@ -14,6 +14,34 @@
   opacity: 0.8;
 }
 
+.matchCardScored {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(190, 242, 100, 0.28),
+      rgba(190, 242, 100, 0.16)
+    ),
+    linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.025));
+  border-color: rgba(190, 242, 100, 0.58);
+}
+
+.matchCardVotingStopped {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(245, 158, 11, 0.28),
+      rgba(245, 158, 11, 0.16)
+    ),
+    linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.025));
+  border-color: rgba(245, 158, 11, 0.58);
+}
+
+.matchCardScored.matchCardPast,
+.matchCardVotingStopped.matchCardPast {
+  opacity: 0.9;
+  filter: none;
+}
+
 .matchResult {
   display: inline-flex;
   justify-content: center;
