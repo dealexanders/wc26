@@ -156,10 +156,26 @@ function normalizeApiData(
     );
   }
 
+  const now = new Date();
+
   const matches = (apiMatches || []).map(
     match => {
       const kickoffAtUtc =
         match.kickoff_at_utc || '';
+
+      const votingClosesAt =
+        parseUtcDate(
+          match.voting_closes_at_utc
+        );
+
+      const hasVotingEnabled =
+        match.voting_enabled !== null &&
+        match.voting_enabled !== undefined;
+
+      const votingEnabled =
+        hasVotingEnabled
+          ? Number(match.voting_enabled) === 1
+          : true;
 
       return {
         id: Number(match.id),
@@ -214,6 +230,16 @@ function normalizeApiData(
 
         isPast:
           Number(match.is_past) === 1,
+
+        votingStopped:
+          (
+            hasVotingEnabled &&
+            !votingEnabled
+          ) ||
+          (
+            votingClosesAt !== null &&
+            votingClosesAt <= now
+          ),
 
         score1:
           match.home_score === null ||
@@ -692,6 +718,13 @@ function matchCard(match) {
   const cardClasses = [
     'matchCard',
     match.isPast ? 'matchCardPast' : '',
+    match.result ? 'matchCardScored' : '',
+    (
+      !match.result &&
+      match.votingStopped
+    )
+      ? 'matchCardVotingStopped'
+      : '',
     match.status === 'FINISHED'
       ? 'matchCardFinished'
       : ''
