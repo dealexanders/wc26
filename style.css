@@ -485,3 +485,61 @@
   --score-tier-1: #4f46e5; /* indigo */
   --score-tier-pending: #bdbdbd;
 }
+
+.gamesList {
+  display: grid;
+  gap: 14px;
+}
+
+.passedGamesAccordion {
+  display: grid;
+  gap: 14px;
+}
+
+.passedGamesButton {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 18px;
+  border: 1px solid rgba(190, 242, 100, 0.55);
+  border-radius: 16px;
+  background: rgba(190, 242, 100, 0.28);
+  color: #f7fee7;
+  cursor: pointer;
+  font-weight: 950;
+  list-style: none;
+  text-transform: uppercase;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+}
+
+.passedGamesButton::-webkit-details-marker {
+  display: none;
+}
+
+.passedGamesButton::after {
+  content: 'Show';
+  color: #111;
+  background: var(--lime);
+  border-radius: 999px;
+  padding: 5px 10px;
+  font-size: 12px;
+}
+
+.passedGamesAccordion[open] .passedGamesButton::after {
+  content: 'Hide';
+}
+
+.passedGamesCount {
+  margin-left: auto;
+  color: #111;
+  background: rgba(190, 242, 100, 0.75);
+  border-radius: 999px;
+  padding: 4px 9px;
+  font-size: 12px;
+}
+
+.passedGamesGrid {
+  margin-top: 14px;
+}
