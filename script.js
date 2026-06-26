@@ -599,7 +599,7 @@ function renderGames() {
 
     <div
       id="gameGrid"
-      class="gameGrid"
+      class="gamesList"
     ></div>
   `;
 
@@ -660,10 +660,45 @@ function renderGames() {
         filteredMatches
       );
 
-    $('#gameGrid').innerHTML =
-      sortedMatches
-        .map(matchCard)
-        .join('');
+    const finishedMatches =
+      sortedMatches.filter(
+        match => String(match.status).toUpperCase() === 'FINISHED'
+      );
+
+    const upcomingMatches =
+      sortedMatches.filter(
+        match => String(match.status).toUpperCase() !== 'FINISHED'
+      );
+
+    const finishedGamesHtml = finishedMatches.length
+      ? `
+        <details class="passedGamesAccordion">
+          <summary class="passedGamesButton">
+            <span>Passed games</span>
+            <span class="passedGamesCount">
+              ${finishedMatches.length}
+            </span>
+          </summary>
+
+          <div class="gameGrid passedGamesGrid">
+            ${finishedMatches.map(matchCard).join('')}
+          </div>
+        </details>
+      `
+      : '';
+
+    const upcomingGamesHtml = upcomingMatches.length
+      ? `
+        <div class="gameGrid futureGamesGrid">
+          ${upcomingMatches.map(matchCard).join('')}
+        </div>
+      `
+      : '';
+
+    $('#gameGrid').innerHTML = `
+      ${finishedGamesHtml}
+      ${upcomingGamesHtml}
+    `;
   };
 
   $('#q').addEventListener(
